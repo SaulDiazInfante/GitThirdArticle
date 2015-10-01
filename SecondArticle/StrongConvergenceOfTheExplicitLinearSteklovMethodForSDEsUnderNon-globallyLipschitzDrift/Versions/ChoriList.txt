@@ -1,0 +1,8 @@
+./Tretyakov.eps
+./InternalHIVDynamics5e-1.eps
+./ConvergenceOrder.eps
+./TimeVsDimension.eps
+./ApplebyEx.eps
+./ContinuousExtension.eps
+./StrongConvergenceLSMethod.tex
+./StrongConvergenceLSMethod.pdf

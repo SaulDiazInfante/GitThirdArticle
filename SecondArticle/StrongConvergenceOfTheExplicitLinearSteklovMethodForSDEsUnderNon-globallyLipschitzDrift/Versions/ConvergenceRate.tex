@@ -1,0 +1,345 @@
+ 
+ In this section, we show that the explicit Linear Steklov method 
+ \eqref{m1}-\eqref{eqn:SolutionFunctions} converges  with a standard order of one-half. For that,
+ we use an analogous procedure as in \cite{Higham2002b}.
+ 
+\begin{lem}
+	Under \Cref{PolynomialGrowth,ass:MomentBounds} and sufficiently small $h$, there exist
+	constants $D'\in \R$ and $q'\in \Z$ such that for all $u,v\in \R^d$
+	\begin{align}
+		|
+			\varphi_{f_h}(u)
+			-\varphi_{f_h}(v)
+		|^2 
+		&\leq
+			D'
+			\left(
+				1 +|u|^{q'} +|v|^{q'}
+			\right)
+			|u-v|^2, \\
+		%
+		|
+			 f(u) -\varphi_{f_h}(u)
+		|^2 
+		&\leq
+			D'
+			\left(
+				1 +|u|^{q'} 
+				\right)
+			h^2, \\
+		%
+		|
+			g(u) -g_h(u)
+		|^2 				 
+		&\leq
+			D'
+			\left(
+				1 +|u|^{q'} 
+			\right)
+			h^2 . \label{eqn:ghPolyGrowth}
+	\end{align}
+\end{lem}
+
+\begin{pf}
+	From relationship \eqref{fo} and inequality \eqref{eqn:PhifhFbound}, we have
+	\begin{equation*}
+		|\varphi_{f_h}(u) - \varphi_{f_h}(v)|^2
+		\leq
+			(2 + L_{\Phi}) |f(u) - f(v)|^2 
+			\leq
+				(2 + L_{\Phi}) D (1 + |u|^q +|v|^q). 
+	\end{equation*}
+	Moreover, if $u \in E_j$ then $\varphi_{f_h}(u) = f^{(j)}(u)$. On the other hand,  if $u\in E_j^c$ then
+	$$
+		|f(u) - \varphi_{f_h}(u)|^2
+		=
+		\sum_{j=1}^d
+			|1-\Phi_j(u)|^2 |f^{(j)}(u)|^2,	
+	$$
+	 By the L'H\^{o}pital 
+	theorem, we get
+	\begin{align*}
+		\lim_{h \to 0} |1-\Phi_j(u)| 
+			&= \left|
+				1-\lim_{h\to 0} \frac{e^{h a_j(u)}-1}{h a_j(u)}
+			\right|			
+			\leq 
+				\left|
+					1-\lim_{h\to 0} e^{h L_a}
+				\right|=0.			
+	\end{align*}
+	Thus there is a sufficiently small $h>0$  such that
+	$|1-\Phi_j(u)|<C h$ for all $u\in E_j^c$ and
+	$$
+		|f(u) - \varphi_{f_h}(u)|^2
+		\leq
+		Ch^2 |f(u)|^2
+		\leq D'(1+|u|^q)h^2,	
+	$$
+	as we require. Meanwhile, given that $g_h(u)=g(F_h(u))$ from \Cref{lem:PhiFhProp} it is followed
+	\begin{equation*}
+		|g(u) - g_h(u)|^2 
+		\leq
+			L_g |u - u +h \varphi{f_h}(u)|^2 
+		\leq 
+			2(1+L_{\Phi})h^2 |f(u)|^2
+		\leq
+			2(1+L_{\Phi}) D(1+|u|^q) h^2. 
+	\end{equation*}
+	\qed
+\end{pf}
+%
+\begin{lem}\label{lem:yhyOh}
+	Assume \Cref{PolynomialGrowth,ass:MomentBounds} hold then the solution $y_h(t)$ of 
+	the modified SDE \eqref{eqn:PerturbedHighamSDE}
+	satisfies
+	\begin{equation}
+		\EX{
+			\sup_{0\leq t \leq T}
+			|y_h(t) - y(y)|^2	
+		} = \mathcal{O}(h^2).
+	\end{equation}	
+\end{lem}
+\begin{pf}
+	We define $e(t):= y(t)-y_h(t)$ where
+	\begin{eqnarray*}
+		y(t) &=& y_0 + \int_{0}^t f(y(s))ds + \int_{0}^t g(y(s))dW(s),  \nonumber\\
+		y_h(t) &=& y_0 + \int_{0}^t \varphi_{f_h}(y_h(s))ds + \int_{0}^t 
+		g_h(y_h(s))dW(s).\nonumber
+	\end{eqnarray*}
+	Using It\^{o}'s formula over the function $V(t,x,y) = |x-y|^2$ for all  $x,y\in \R^d$, we obtain 
+$$
+		d e(t) = 
+		\left(
+			f(y(t)) - \varphi_{f_h}(y(t)) dt
+		\right)
+		+
+		\left(
+			g(y(t)) - g_h(y_h(t))
+		\right) dW(t),
+	$$
+	Thus
+	\begin{align} \label{eqn:IntErrToBound}
+		|e(t)|^2 
+		&=
+			2 \underbrace{\int_{0}^t
+				\innerprod{e(s)}{f(y(s))-\varphi_{f_h}(y_h(s))} ds }_{:=I_1}
+			+
+			\underbrace{\int_{0}^t
+				|g(y(s)) - g_h(y_h(s))|^2 ds }_{:=I_2}\notag\\
+		&+
+			2 \underbrace{\int_{0}^t
+				\innerprod{e(s)}{\left[ g(y(s))-g_h(y_h(s)) \right] dW(s)}}_{:=I_3}.	\end{align}
+	Now we proceed to bound each integral of inequality \eqref{eqn:IntErrToBound}. 
+	By \Cref{PolynomialGrowth}, the Young and  standard 
+	inequalities, we get
+	\begin{align*}
+		I_1(t) 
+		&\leq
+			2\int_0^t
+				\innerprod{y(s) - y_h(s)}{f(y(s))-f(y_h(s))} ds
+			+
+			 \int_0^t
+				 \innerprod{y(s) - y_h(s)}{f(y_h(s))-\varphi_{f}(y_h(s))} ds \notag\\
+%	
+		&\leq
+			3\int_0^t
+				|y(s) - y_h(s)|^2ds
+			+ D' h^2 
+			\int_0^t
+				1 + |y_h(s)|^{q'} ds.
+	\end{align*}
+	Since $y_h(t)$  the has bonded moments, there exists a universal constant $L$ which does not depends on $h$ 
+	such that
+	\begin{equation}\label{eqn:I1Bound} 
+		 \EX{
+			 I_1(s)	
+		 }
+		 \leq
+			 L\int_{0}^t
+				\m{|e(s)|^2} ds
+		+ L h^2.
+	 \end{equation}
+	Meanwhile, using  \Cref{ass:OSLC,PolynomialGrowth} it is followed
+	\begin{align*}
+		I_2(t) 
+		&\leq
+			2 L_g 
+			\int_{0}^t
+				|y(s) - y_h(s)|^2 ds
+			+
+			2D'h^2
+			\int_0^t
+				1 + |y_h(s)|^q ds. 	 
+	\end{align*}
+	and thus
+	\begin{equation} \label{t5}
+		\EX{
+			I_2(s)	
+		}
+		\leq
+		L\int_{0}^t
+		\m{|e(s)|^2} ds
+		+ L h^2.
+	\end{equation}
+	Note that $\EX{ I_3(t)} \leq \EX{ 
+				\sup_{0\leq s \leq t}
+				|I_3(s)|
+			}$.
+	From the Burkholder-Davis-Gaundy inequality, \Cref{ass:OSLC,PolynomialGrowth} and 
+	as $y_h(t)$ has bounded moments, we see that
+	\begin{align}
+		\EX{ 
+			\sup_{0\leq s \leq t}
+			|I_3(s)|
+		}
+		%
+		&\leq
+		2^4 
+		\EX{
+			\sup_{0 \leq s \leq t}
+			|e(s)|^2
+			\int_{0}^t
+				|g(y(s))-g_h(y(s))|^2 ds
+		}^{1/2} \notag \\
+		&\leq
+		2^4 
+		\EX{
+			\frac{1}{2 \cdot 2^9}
+			\left(
+				\sup_{0\leq s \leq t}
+				|e(s)|^2
+			\right)			
+			+
+			\frac{2^9}{2}
+			\left(
+				\int_{0}^t
+					|g(y(s)) - g_h(y_h(s))|^2 ds
+			\right)^2
+		}
+		\notag \\
+		%
+		&\leq
+			\frac{1}{2}
+			\EX{
+				\sup_{0 \leq s \leq t}
+				|e(s)|^2
+			}
+		+2^8
+		\EX{
+			\int_{0}^t
+				|g(y(s)) - g_h(y_h(s))|^2	
+			ds
+		}\notag\\
+		%
+		&\leq
+			2 L_g
+			\EX{
+				\int_{0}^t
+					|y(s) - y_h(s)|^2 ds		
+				} 
+			+D'Th^2 
+			+
+			D'Th^2
+			\int_{0}^t
+				\m{|y_h(s)|^{q'}} ds 	
+		\notag \\
+		&\leq
+			L
+			\int_{0}^t
+				\m |e(s)|^2 ds
+			+L h^2. \label{eqn:I3Bound}
+	\end{align}
+	Substituting inequalities \eqref{eqn:I1Bound}, \eqref{t5} and \eqref{eqn:I3Bound} 
+	on equation \eqref{eqn:IntErrToBound}, we deduce that
+	\begin{equation*}
+		\EX{
+			\sup_{0\leq s \leq t}	
+			|e(t)|^2
+		}
+		\leq
+			L \int_0^t
+				\m |e(s)|^2 ds
+			+
+			L h^2 
+		\leq		
+			L \int_{0}^t
+				\EX{
+					\sup_{0\leq r \leq s}
+					|e(s)|^2	
+				}ds
+			+Lh^2.		
+	\end{equation*}
+	By the Gronwall inequality, we conclude that
+	\begin{equation*}
+		\EX{
+			\sup_{0 \leq t \leq T} 	
+			|e(t)|^2
+		}
+		\leq
+			L  \exp(LT) h^2 \leq C h^2.
+	\end{equation*} 	
+		\qed
+\end{pf}
+
+	We  can now obtain the convergence rate of the explicit Linear Steklov method.
+
+\begin{thm}
+	Consider the \SM method applied to SDE \eqref{eqn:SDE1} and under \Crefrange{ass:OSLC}{PolynomialGrowth}.
+	Then there exist a continuous extension $\overline{Y}(t)$ of the LS numerical approximation for which
+	\begin{equation*}
+		\EX{
+			\sup_{0 \leq t \leq T}
+			|\overline{Y}(t) - y(t)|^2	
+		} = \mathcal{O}(h).	
+	\end{equation*}
+\end{thm}
+\begin{pf}
+	 We can bound
+	\begin{align*}
+		\EX{
+			\sup_{0 \leq t \leq T}	
+			|\overline{Y}(t) - y(t)|^2
+		}
+		%
+		&\leq 
+		2 \EX{
+			\sup_{0 \leq t \leq T}	
+			|\overline{Y}(t) - y_h(t)|^2
+		}
+		+
+		2 \EX{
+			\sup_{0 \leq t \leq T}	
+			|y_h(t) - y(t) |^2
+		}.\\		
+	\end{align*}	
+	By \Cref{lem:yhyOh} we have
+	$$
+		\EX{
+			\sup_{0 \leq t \leq T}	
+			|y_h(t) - y(t) |^2 
+		}= \mathcal{O}(h^2),
+	$$
+	then it remains to prove that 
+	$$
+		\EX{
+			\sup_{0 \leq t \leq T}	
+			|\overline{Y}(t) - y_h(t)|^2
+		},
+	$$
+	but  $\overline{Y}(t)$ can be regarded as the EM applied to the modified SDE \eqref{eqn:SDEMod}, and by
+	Lemmas \eqref{lem:BoundAndConvergenceOfyh},\eqref{lem:SSSMMomentBounds} and \Cref{col:ContinuousExtBoundedMoments}
+	$y_h$ ,$Y_k$ and $\overline{Y}(t)$ has bounded moments, then adapting the proof of 
+	\Cref{thm:EulerConvergenceRateHMS} (see \cite[Thm. 4.4]{Higham2002b}) we can deduce that
+	\begin{equation*}
+		\EX{
+			\sup_{0 \leq t \leq T}	
+			|\overline{Y}(t) - y_h(t)|^2
+		} = \mathcal{O}(h).
+	\end{equation*}
+	as we require. \qed
+\end{pf}
+%
+%********************************************************************************************
+%              Section 7
+%********************************************************************************************

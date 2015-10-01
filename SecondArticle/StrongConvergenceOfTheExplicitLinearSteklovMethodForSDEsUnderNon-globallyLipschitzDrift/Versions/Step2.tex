@@ -1,0 +1,95 @@
+%======================================================================================================================
+%                                                 STEP 2                                                              %
+%======================================================================================================================
+
+	Now we proceed with step 2. In what follows $C$ denotes a generic positive constant independent of the step $h$, and
+which value could change at each appearances.
+\begin{lem}\label{lem:BoundAndConvergenceOfyh}
+	Assume \Cref{ass:OSLC,ass:ajBound,ass:HypThmSingularities} hold, then there is a constant $C=C(p,T)>0$ and a sufficiently small
+	step size $h$, such that for all $p>2$
+	\begin{equation}\label{eqn:yh-MomentBounds}
+		\m\left[
+			\sup_{0\leq t \leq T}
+				|y_h(t)|^p
+		\right]
+		\leq
+			C
+		\left( 
+			1+\m |y_0|^p
+		\right).
+	\end{equation}
+	Moreover
+	\begin{equation}\label{eqn:yh-convergence}
+	\lim_{h \to 0}
+	\m\left[
+	\sup_{0\leq t \leq T}
+	|y(t)-y_h(t)|^2
+	\right]=0.
+	\end{equation}
+\end{lem}
+\begin{pf}
+	By theorem \ref{thm:MaoCoercive} and inequality \eqref{eqn:h-MonotoneCondition}, 
+	we have	 bound \eqref{eqn:yh-MomentBounds}.
+	On the other hand, to prove \eqref{eqn:yh-convergence} we will use the properties of 
+	$\varphi_{f_h}$ and the Higham's stopping time technique employed in \cite[Thm 2.2]{Higham2002b}. 
+	Note that by relationship \eqref{eqn:VarPhiEjc}, we can rewrite the Steklov function  as
+	\begin{align}\label{fo}
+		\varphi_{f_h}(u) 
+			&=  f^{(j)}(u) \1{E_j}(u) +\Phi_j(u) f^{(j)}(u) \1{E_j^c}(u) .
+	\end{align}
+	 Let $u\in \R^d$, $|u|<n$ by \Cref{l1} we have $|\Phi(u)|\leq L_{\Phi}$ and since $f \in C^1(\R^d)$, there is a 
+	 positive  constant $R_n$, which depends on $n$, such that 
+	\begin{align*}	
+		|\varphi_{f_h}^{(j)}(u) - f^{(j)}(u)|
+		&\leq
+			\1{E_j^c}(u)
+			|f^{(j)}(u)|
+			\left|
+				\Phi_j(u) - 1
+			\right| \notag \\
+		&\leq
+			\1{E_j^c}(u)
+			\left(
+				L_{\Phi} + 1
+			\right)
+			|f(u)|	 \notag \\
+		&\leq
+		\1{E_j^c}(u) R_n(L_{\Phi}+1), \quad \forall u \in \R^d, \quad |u|\leq n,
+	\end{align*}
+	for each $j\in \{1,\dots, d\}$. At the interface betweeen $E_j$ and $E_j^c$, 
+	we know by the scalar L' H\^{o}pital theorem that 
+	$ \lim_{h\to 0} \Phi_j(u) = 1$ for each fixed $u\in E_j^c$.
+	And if $u\in E_j$,  by \Cref{ass:HypThmSingularities} and using   
+	theorems \ref{thm:Lawlor} or \ref{thm:Fine}, we have 
+	\begin{equation*}
+	\lim_{h \to 0} F_h^{(j)}(u)
+		=
+		\lim_{h \to 0}
+			e^{ha_j(u)} u^{(j)} + 
+		\lim_{h \to 0}
+			\left( \Phi_j(u)
+				\1{E_j^c}(u)
+				+h \1{E_j}(u)
+			\right)
+			b_j(u^{(j)}) 
+		= u^{(j)},
+	\end{equation*}
+	for each $j \in \{1, \dots , d\}$, hence
+	$%\begin{equation*}
+		\displaystyle
+		\lim_{h\to 0} F_h(u)=u.
+	$ %\end{equation*}
+	In addition, $g_h$ and $g$ are locally Lipschitz. So, given $n>0$ there is  a function 
+	$K_n(\cdot):(0,\infty)\to (0,\infty)$ such that
+	$K_n(h)\to 0$ when $h \to 0$ and
+	\begin{equation}\label{eqn:PhihGhKRhBound}
+		|\varphi_{f_h}(u)-f(u)|^2 \vee |g_h(u)-g(u)|^2
+		\leq K_n(h) \qquad \forall u\in \R^d, \quad |u| \leq n.
+	\end{equation}
+	Also, $f$, $g$ are $C^{1}$, then there is  a constant $H_n>0$ such that
+	\begin{equation}\label{eqn:f-gHRBound}
+		|f(u)-f(v)|^2 \vee |g(u)-g(v)|^2
+		\leq H_n |u-v|^2\qquad \forall u,v \in \R^d, \quad|u|\vee |v| \leq n.
+	\end{equation}
+	The rest of the proof run as in \citep[Lem. 3.6]{Higham2002b}. \qed
+\end{pf}

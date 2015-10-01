@@ -1,0 +1,617 @@
+
+ To prove strong convergence of the Linear Steklov method \eqref{m1}-\eqref{eqn:SolutionFunctions} for  
+SDEs with locally Lipschitz coefficients, we rely on the Higham-Mao-Stuart (HMS) technique  
+ \cite{Higham2002b}. Recently, several works have used  this  procedure  
+ to establish strong convergence for some particular scheme among others \cite{Beyn2010,Guo2014,Hutzenthaler2015,Hutzenthaler2012a,Hutzenthaler2010,Lamba2007,
+ Mao2013,Tretyakov2013}. The proof is rather technical and can be divided into the following steps:
+ 
+ \begin{enumerate}[\bf{Step} 1:]
+ 	\item The explicit LS method \eqref{m1}-\eqref{eqn:SolutionFunctions} is equivalent to 
+ 	the Euler-Maruyama method \eqref{eqn:EulerMaruyamaHigham} 
+	for the conveniently modified SDE
+	\begin{equation} \label{eqn:PerturbedHighamSDE}
+		dy_h(t)= \varphi_{f_h}(y_h(t))dt +g_h(y_h(t))dW(t),
+		\qquad y_h(0)=y_0,  \qquad t\in [0,T],
+	\end{equation}
+	which is a perturbation of SDE \eqref{eqn:SDE1} given that $|f(x)-\varphi_{f_h}(x)|=\calO(h)$.
+	\item\label{stp:PerturbedSolution}
+			The solution of the modified SDE \eqref{eqn:PerturbedHighamSDE} has 
+			bounded moments and it is 
+			"close" to  the solution of the SDEs \eqref{eqn:SDE1}  in the sense of the uniform mean square norm 
+			$
+				\EX{\sup_{0\leq t\leq T}|\cdot|^2}
+			$.
+	\item
+	\label{stp:MethodBoundedMoments}
+		The explicit LS method  has bounded moments.
+	\item
+		There is a continuous extension of the explicit LS method of the form:
+		$$\overline{Y}(t):=Y_0+\int_0^t\varphi_{f_h}(Y_{\eta(s)})\,ds+\int_0^t g(Y_{\eta(s)})\,dW(s), \qquad  
+		\eta(t):=k \,\mbox{ for } t\in[t_k,t_{k+1}),$$
+		 which has bounded moments.
+	\end{enumerate}	
+	Proving the above statements and using theorem \ref{thm:HighamMaoStuart},
+	we  conclude the strong convergence of the explicit LS method. 
+	Step 1 is formalized in the following corollary.
+	
+%======================================================================================================================
+%                                                 STEP 1                                                              %
+%======================================================================================================================
+
+\begin{corollary}\label{col:SSSMeEMmod}
+	Assume \Cref{ass:OSLC,ass:ajBound,ass:HypThmSingularities} hold, then the 
+	explicit \SM method \eqref{m1}-\eqref{eqn:SolutionFunctions} for SDE \eqref{eqn:SDE1} is 
+	equivalent to the Euler-Maruyama scheme applied to the modified SDE \eqref{eqn:PerturbedHighamSDE}.
+\end{corollary}
+\begin{pf}
+	Using the functions $\varphi_{f_h}(\cdot)$ and $g_h(\cdot)$ defined in \eqref{eqn:FunctionshDefinition}, 
+	we can rewrite the explicit \SM method  as 
+	$$
+		Y_{k+1} = Y_k + h \varphi_{f_h}(Y_k) + g_h(Y_k)\Delta W_k,
+	$$
+	which is the EM approximation for the modified SDE \eqref{eqn:PerturbedHighamSDE}. \qed
+\end{pf}
+%======================================================================================================================
+%                                                 STEP 2                                                              %
+%======================================================================================================================
+
+	Now we proceed with step 2. In what follows $C$ denotes a generic positive constant independent of the step $h$, and
+which value could change at each appearances.
+\begin{lem}\label{lem:BoundAndConvergenceOfyh}
+	Assume \Cref{ass:OSLC,ass:ajBound,ass:HypThmSingularities} hold, then there is a constant $C=C(p,T)>0$ and a sufficiently small
+	step size $h$, such that for all $p>2$
+	\begin{equation}\label{eqn:yh-MomentBounds}
+		\m\left[
+			\sup_{0\leq t \leq T}
+				|y_h(t)|^p
+		\right]
+		\leq
+			C
+		\left( 
+			1+\m |y_0|^p
+		\right).
+	\end{equation}
+	Moreover
+	\begin{equation}\label{eqn:yh-convergence}
+	\lim_{h \to 0}
+	\m\left[
+	\sup_{0\leq t \leq T}
+	|y(t)-y_h(t)|^2
+	\right]=0.
+	\end{equation}
+\end{lem}
+\begin{pf}
+	By theorem \ref{thm:MaoCoercive} and inequality \eqref{eqn:h-MonotoneCondition}, 
+	we have	 bound \eqref{eqn:yh-MomentBounds}.
+	On the other hand, to prove \eqref{eqn:yh-convergence} we will use the properties of 
+	$\varphi_{f_h}$ and the Higham's stopping time technique employed in \cite[Thm 2.2]{Higham2002b}. 
+	Note that by relationship \eqref{eqn:VarPhiEjc}, we can rewrite the Steklov function  as
+	\begin{align}\label{fo}
+		\varphi_{f_h}(u) 
+			&=  f^{(j)}(u) \1{E_j}(u) +\Phi_j(u) f^{(j)}(u) \1{E_j^c}(u) .
+	\end{align}
+	 Let $u\in \R^d$, $|u|<n$ by \Cref{l1} we have $|\Phi(u)|\leq L_{\Phi}$ and since $f \in C^1(\R^d)$, there is a 
+	 positive  constant $R_n$, which depends on $n$, such that 
+	\begin{align*}	
+		|\varphi_{f_h}^{(j)}(u) - f^{(j)}(u)|
+		&\leq
+			\1{E_j^c}(u)
+			|f^{(j)}(u)|
+			\left|
+				\Phi_j(u) - 1
+			\right| \notag \\
+		&\leq
+			\1{E_j^c}(u)
+			\left(
+				L_{\Phi} + 1
+			\right)
+			|f(u)|	 \notag \\
+		&\leq
+		\1{E_j^c}(u) R_n(L_{\Phi}+1), \quad \forall u \in \R^d, \quad |u|\leq n,
+	\end{align*}
+	for each $j\in \{1,\dots, d\}$. At the interface betweeen $E_j$ and $E_j^c$, 
+	we know by the scalar L' H\^{o}pital theorem that 
+	$ \lim_{h\to 0} \Phi_j(u) = 1$ for each fixed $u\in E_j^c$.
+	And if $u\in E_j$,  by \Cref{ass:HypThmSingularities} and using   
+	theorems \ref{thm:Lawlor} or \ref{thm:Fine}, we have 
+	\begin{equation*}
+	\lim_{h \to 0} F_h^{(j)}(u)
+		=
+		\lim_{h \to 0}
+			e^{ha_j(u)} u^{(j)} + 
+		\lim_{h \to 0}
+			\left( \Phi_j(u)
+				\1{E_j^c}(u)
+				+h \1{E_j}(u)
+			\right)
+			b_j(u^{(j)}) 
+		= u^{(j)},
+	\end{equation*}
+	for each $j \in \{1, \dots , d\}$, hence
+	$%\begin{equation*}
+		\displaystyle
+		\lim_{h\to 0} F_h(u)=u.
+	$ %\end{equation*}
+	In addition, $g_h$ and $g$ are locally Lipschitz. So, given $n>0$ there is  a function 
+	$K_n(\cdot):(0,\infty)\to (0,\infty)$ such that
+	$K_n(h)\to 0$ when $h \to 0$ and
+	\begin{equation}\label{eqn:PhihGhKRhBound}
+		|\varphi_{f_h}(u)-f(u)|^2 \vee |g_h(u)-g(u)|^2
+		\leq K_n(h) \qquad \forall u\in \R^d, \quad |u| \leq n.
+	\end{equation}
+	Also, $f$, $g$ are $C^{1}$, then there is  a constant $H_n>0$ such that
+	\begin{equation}\label{eqn:f-gHRBound}
+		|f(u)-f(v)|^2 \vee |g(u)-g(v)|^2
+		\leq H_n |u-v|^2\qquad \forall u,v \in \R^d, \quad|u|\vee |v| \leq n.
+	\end{equation}
+	The rest of the proof run as in \citep[Lem. 3.6]{Higham2002b}. \qed
+\end{pf}
+
+%======================================================================================================================
+%                                                 STEP 3                                                              %
+%======================================================================================================================
+In the following, we proceed with step 3 which establishes that \SM method has bounded moments. 
+This is  the key step in the HSM technique.
+
+
+\begin{lem}\label{lem:SSSMMomentBounds}
+	Assume \Cref{ass:OSLC,ass:ajBound,ass:HypThmSingularities} hold, then for each $p\geq 2$ there is 
+	a universal positive constant 
+	$C=C(p,T)$ 
+	such that for the explicit \SM method \eqref{m1}-\eqref{eqn:SolutionFunctions} is satisfied
+	\begin{equation*}
+		\m\left[
+		\sup_{kh \in [0,T]}
+		|Y_k|^{2p}
+		\right]\leq C.
+	\end{equation*}
+\end{lem}
+\begin{pf}
+	Using a split formulation of the \SM scheme \eqref{m1}-\eqref{eqn:SolutionFunctions} as follows:
+	\begin{eqnarray*}
+ 	Y_{k}^{{\star}^{(j)}} &=& A^{(1)}(h,Y_k) Y_k + A^{(2)}(h,Y_k) b(Y_k), \label{split1}\\
+	Y_{k+1}^{(j)}&=& Y_k^{{\star}^{(j)}} + g^{(j)}(Y_k^{\star})\, \Delta W_k 
+	\label{split2},
+\end{eqnarray*}
+	from the first step of this split scheme, using (A-3) and 
+	the Cauchy-Schwartz inequality, we get
+	\begin{eqnarray}
+		|Y_k^{\star}|^{2}
+		&\leq&
+			|A^{(1)}(h,Y_k)|^2 |Y_k|^2  
+			+ 2 \innerprod{A^{(1)}(h,Y_k)Y_k}{A^{(2)}(h,Y_k) Y_k b(Y_k)}
+			+|A^{(2)}(h,Y_k)|^2 |b(Y_k)|^2\nonumber\\
+		&\leq&
+			|A^{(1)}(h,Y_k)|^2 |Y_k|^2  
+		+ 2 \sqrt{L_b} d|A^{(1)}(h,Y_k)||A^{(2)}(h,Y_k)||Y_k|(1+|Y_k|)
+		\label{leqn:Yn2Bound} 
+		\\& & +L_b|A^{(2)}(h,Y_k)|^2 (1+|(Y_k)|^2). \nonumber
+	\end{eqnarray}
+	From (A-2), we can deduce that
+	\begin{dmath}[label=eqn:A1Bound]
+		|A^{(1)}(h,Y_k)|^2 
+		=
+			\left|
+				\diag
+				\left(
+					e^{ha_1(Y_k)}, \dots, e^{ha_d(Y_k)} 
+				\right)
+			\right|^2
+		\leq L_{A^{(1)}},		
+	\end{dmath}
+	where $L_{A^{(1)}}=d\, e^{ 2 T L_a}$ and also by \eqref{eqn:PhiBound}, we deduce that
+	\begin{align}
+		|A^{(2)}(h,Y_k)|^2 
+		&=
+		\left|
+			h 
+			\diag
+			\left(
+				\1{E_1}(Y_k)
+				+\1{E_1^c}(Y_k)\Phi_1(Y_k), 
+				\dots,
+				\1{E_d}(Y_k)
+				+\1{E_d^c}(Y_k) \Phi_d(Y_k)
+			\right)
+		\right|^2 \notag \\
+		%
+		&\leq
+		\sum_{j=1}^{d}
+		\left(
+			\1{E_j^c}
+			|h\Phi_j(Y_k)|^2
+			+ h^2
+		\right)
+		\leq
+		2 e^{2 L_a  T}
+				\sum_{j=1}^d
+				\frac{1}{a_j^*} + d T^2\leq L_{A^{(2)}}.
+		\label{eqn:A2Bound}
+	\end{align}
+	Combining \eqref{eqn:A1Bound} and \eqref{eqn:A2Bound}  on  inequality \eqref{leqn:Yn2Bound} yields
+	\begin{eqnarray}\label{eqn:YkStarBound}
+		|Y_k^{\star}|^2
+		&\leq&	L_{A^{(1)}} |Y_k|^2
+			+ 2 d \sqrt{L_{A^{(1)}} L_{A^{(2)}} L_b }\,|Y_k|(1+|Y_k|)
+			+L_{A^{(2)}} L_b (1+|Y_k|^2) \nonumber\\
+			&\leq& 
+				C(3|Y_k|^2+|Y_k| + 1) 			
+			\leq C(1+|Y_k|^2),
+	\end{eqnarray}
+	where $C\geq L_{A^{(1)}}+ 2 d \sqrt{L_{A^{(1)}} L_{A^{(2)}} L_b} + 
+	L_{A^{(2)}} L_b$. Applying  the bound \eqref{eqn:YkStarBound} 
+	in the  second step of the split scheme, we get
+	\begin{equation*}
+		|Y_{k+1}|^2
+		\leq
+			C \left(
+				|Y_k|^2 + 1
+			\right)
+			+ 2\innerprod{Y^{\star}_k}{g(Y^{\star}_k) \Delta W_k}
+			+ \left|g(Y^{\star}_k) \Delta W_k \right|^2.
+	\end{equation*}
+	Now, we choose two integers $N,M$ such that $Nh\leq Mh \leq T$. So, adding 
+	backwards we obtain
+	\begin{equation*}
+		|Y_N|^2
+			\leq
+			S_N\left(
+				\sum_{j=0}^{N-1}
+					(1+|Y_j|^2)
+				+
+				2\sum_{j=0}^{N-1}
+					\innerprod{Y_j^{\star}}{g(Y_j^{\star}) \Delta W_j}
+				+
+				\sum_{j=0}^{N-1}
+					\left|
+						g(Y_j^{\star}) \Delta W_j
+					\right|^2
+			\right),
+	\end{equation*}
+	where	$S_N:=	\sum_{j=0}^{N-1}C^{N-j}$. Raising both sides to the power $p$ and 
+	using the standard inequality, we obtain
+	\begin{align}\label{eqn:RelationToBound}
+		|Y_N|^{2p}	
+			&\leq
+				6^{p} S_N^p
+				\left(
+					N^{p-1}
+						\sum_{j=0}^{N-1}
+						(1+|Y_j|^{2p})	
+					+
+					\left|
+						\sum_{j=0}^{N-1}
+						\innerprod{Y_j^{\star}}{g(Y_j^{\star}) \Delta W_j}
+					\right|^p
+					+
+					N^{p-1}
+					\sum_{j=0}^{N-1}
+						\left|
+							g(Y_j^{\star}) \Delta W_j
+						\right|^{2 p}				
+				\right).
+	\end{align}
+	Now we will show that the second and third terms of inequality \eqref{eqn:RelationToBound} are bounded.
+	We denote by $C=C(p,T)$ a generic positive constant which does not depend on  the step size $h$ and whose
+	value may change between occurrences.	Next, applying the Bunkholder-Davis-Gundy 
+	inequality, we see that
+	\begin{align}\label{eqn:BoundSecondTerm}
+		\m
+		\left[
+			\sup_{0\leq N \leq M}
+			\left|
+				%\exp(2hpNL)
+				\sum_{j=0}^{N-1}
+					\innerprod{Y_j^{\star}}{g(Y_j^{\star})\Delta W_j}
+			\right|^{p}
+		\right]
+		&\leq
+			C\m
+			\left[
+				\sum_{j=0}^{N-1}
+					|Y_j^{\star}|^2
+					|g(Y_j^{\star})|^2
+					h
+			\right]^{p/2}
+			\notag\\
+		&\leq
+			C h^{p/2}M^{p/2-1}
+			\m
+				\sum_{j=0}^{M-1}
+					|Y_j^{\star}|^p (\alpha +\beta |Y_j^{\star}|^2)^{p/2}
+			\notag\\
+		&\leq
+			2^{p/2-1}C T^{p/2-1} h  
+			\m
+			\sum_{j=0}^{M-1}
+				(\alpha^{p/2}|Y_j^{\star}|^p +\beta^{p/2} |Y_j^{\star}|^{2p})
+			\notag\\
+		&\leq
+			C h
+			\m
+			\sum_{j=0}^{M-1}
+				(1+2|Y_j^{\star}|^p + |Y_j^{\star}|^{2p})
+			\notag\\
+		&\leq
+			C h 
+			\sum_{j=0}^{M-1}
+			\left[
+				1+\m|Y_j^{\star}|^{2p}
+			\right]
+			\notag\\
+		&\leq
+			C 
+			+ 
+			C h 
+			\sum_{j=0}^{M-1}
+				\m|Y_j|^{2p},				
+	\end{align}
+	 Now, using the Cauchy-Schwartz inequality, the monotone condition 
+	\eqref{eqn:MonotoneCondition} and the bound \eqref{eqn:YkStarBound}, we obtain
+	\begin{align}
+	\m\left[
+		\sup_{0\leq N \leq M}
+			\sum_{j=0}^{N-1}
+			\left|
+				g(Y_j^{\star})\Delta W_j
+			\right|^{2p}	
+		\right]
+		&=
+			\m
+				\sum_{j=0}^{M-1}
+					\left|
+						g(Y_j^{\star})\Delta W_j
+					\right|^{2p}
+			\notag\\
+		&\leq	
+			\sum_{j=0}^{M-1}
+				\m
+					\left|
+						g(Y_j^{\star})
+					\right|^{2p}
+				\m
+					\left|
+						\Delta W_j
+					\right|^{2p}
+			\notag \\
+		&\leq
+			C h^p
+			\sum_{j=0}^{M-1}
+			\m
+				\left[
+					\alpha +\beta|Y^{\star}_j|^2
+				\right]^p
+			\notag\\
+	%
+		&\leq
+			Ch^p
+			\sum_{j=0}^{M-1}
+			\m
+				\left[
+					\alpha ^p +\beta^p |Y^{\star}_j|^{2p}
+				\right]
+			\notag\\
+		&\leq
+		Ch^{p-1}
+		+
+		Ch^p \sum_{j=0}^{M-1}
+			\m|Y_j|^{2p} \label{eqn:BoundThirdTerm}.
+	\end{align}
+	Thus, combining bounds \eqref{eqn:BoundSecondTerm} and \eqref{eqn:BoundThirdTerm} with the inequality 
+	\eqref{eqn:RelationToBound}, we can assert that
+	\begin{align}
+		\EX{
+			\sup_{0\leq N \leq M}
+					|Y_N|^{2p} 
+		}
+% 		\leq
+% 			C(M,T) + C(M,T)(1+h)
+% 			\sum_{j=0}^{M-1}
+% 				\m|Y_j|^{2p}
+		\leq	
+			C +C(1+h) 
+			\sum_{j=0}^{M-1}
+				\EX{
+					\sup_{0\leq N \leq j}
+					|Y_N|^{2p}
+				}	
+		.
+	\end{align}
+	Finally, using the discrete-type Gronwall inequality, we conclude that
+	\begin{align*}
+		\EX{
+			\sup_{0\leq N \leq M}
+			|Y_N|^{2p} 
+		}	
+		&\leq
+			C e^{C(1+h)M} 
+		\leq 
+		C e^{C(1+T)}<C,
+	\end{align*}
+	since the constant C does not depend on $h$, the proof is complete. \qed
+\end{pf}
+%======================================================================================================================
+%                                                 STEP 4                                                              %
+%======================================================================================================================
+	
+	
+Let $\{Y_k\}$ denote the explicit \SM solution of SDE \eqref{eqn:SDE1} defined by 
+the recurrence equations \eqref{m1}-\eqref{eqn:SolutionFunctions}.
+By corollary \ref{col:SSSMeEMmod}, we can give a continuous extension for the \SM approximation 
+from the time continuous EM extension  \eqref{extE}. 
+Moreover, we will also prove in the following theorem that the  moments 
+of the continuous LS extension remains bounded.
+\begin{corollary}\label{col:ContinuousExtBoundedMoments}
+	Assume \Cref{ass:OSLC,ass:ajBound,ass:HypThmSingularities} hold and suppose  $0<h<1$ and $p\geq 
+	2$. Then there is a continuous extension $\overline{Y}(t)$ of the 
+	Linear Steklov recurrence $\{Y_k\}$ defined by  
+	\eqref{m1}-\eqref{eqn:SolutionFunctions}  and a positive constant $C=C(T,p)$ such 
+	that
+	\begin{equation*}
+		\EX{\sup_{0\leq t \leq T} |\overline{Y}(t)|^{2p} }
+		\leq C.
+	\end{equation*}
+\end{corollary}
+	\begin{pf}
+		We take $t=s+t_k$ in $ [0,T]$ such that $\Delta W_k(s):= W(t_k+s)- W(t_k)$ for $0\leq s <h$.
+		Then we define 
+		\begin{equation}\label{eqn:SSLSContinuousExtension}
+			\overline{Y}(t_k+s):= Y_k + s \varphi_{f_h}(Y_k) + g_h(Y_k)\Delta W_k(s),
+		\end{equation}
+		as a continuous extension of the \SM scheme \eqref{m1}-\eqref{eqn:SolutionFunctions}. 
+		We proceed to show that $\overline{Y}(t)$ has bounded moments.
+		Using the split formulation, we have $Y_k^{\star}= Y_k + h \varphi_{f_h}(Y_k)$,
+		that is
+		\begin{align*}
+			Y_k + s \varphi_{f_h}(Y_k)=\gamma Y_k^{\star} + (1-\gamma)Y_k,
+		\end{align*}
+		where $\gamma = s/h$. Hence, we can rewrite the continuous extension \eqref{eqn:SSLSContinuousExtension} as
+		\begin{equation}\label{re1}
+			\overline{Y}(t) =
+			\gamma Y^{\star}_k + (1-\gamma) Y_k +g_h(Y_k) \Delta W_k(s). %\label{eqn:SSLSMConExt}
+		\end{equation}
+		Using bound \eqref{eqn:YkStarBound} in \eqref{re1}, we get
+		\begin{align}
+			|\overline{Y}(t_k+s) |^2 
+			\leq \hspace{-0.1cm}
+				3\left[
+					\gamma C
+					+
+					\left(
+						\gamma C +1 - \gamma
+					\right)
+					|Y_k|^2
+					+
+					|g_h(Y_k)\Delta W_k(s)|^2
+			\right] \hspace{-0.15cm}\leq\hspace{-0.1cm}
+			C
+			+
+			C
+			\left(
+				|Y_k|^2 + |g_h(Y_k)\Delta W_k(s)|^2
+			\right).
+		\notag
+		\end{align}
+	\end{pf}
+	Thus, 
+	\begin{equation}
+		\hspace{-0.2cm}\sup_{0\leq t\leq T} |\overline{Y}(t)|^{2p}
+		\leq
+			\hspace{-0.2cm}\sup_{0\leq kh\leq T}
+			\left[
+				\sup_{0\leq s\leq h}
+					|\overline{Y}(t_k+s)|^{2p} 
+			\right] 
+		\leq
+			\hspace{-0.2cm}\sup_{0\leq kh\leq T} 
+			\left[
+				\sup_{0\leq s\leq h}
+					C 
+					\left(
+						1 + |Y_k|^{2p} + |g_h(Y_k)\Delta W_k(s)|^{2p}
+					\right)
+			\right],
+		\label{eqn:BeforeDoob}
+	\end{equation}
+	for $t\in [0,T]$.
+	%
+	Now, taking a non negative integer $0 \leq k \leq N$ such that $0\leq Nh \leq T$, we obtain
+	\begin{align}
+		\sup_{0\leq t\leq T} |\overline{Y}(t)|^{2p}
+		&\leq 
+			C
+			\left(
+				1
+				+
+				\sup_{0\leq kh\leq T} 
+					|Y_k|^{2p}
+					+
+					\sup_{0\leq s\leq h}
+						\sum_{j=0}^N
+							|g_h(Y_j)\Delta W_j(s)|^{2p}
+			\right) \label{eqn:SumDiffusion}.
+	\end{align}
+	So, using the Doob's Martingale inequality, lemma
+	\ref{lem:SSSMMomentBounds} and that $g_h$ is a locally 
+	Lipschitz function, we can bound each term of the inequality \eqref{eqn:SumDiffusion}
+	as follows
+	\begin{align}
+		\EX{
+			\sup_{0 \leq s \leq h} |g(Y_j) \Delta W_j(s)|^{2p}
+		}
+		\leq
+			\left(
+				\frac{2p}{2p-1}
+			\right)^{2p}
+			\m|g_h(Y_j)\Delta W_j(h)|^{2p}
+% 		&\leq
+% 			C \m |g_h(Y_j)|^{2p} \m |\Delta W_j(h)|^{2p} \notag\\
+		\leq
+			C h^p
+			\left(
+				1 + \m|Y_j|^{2p}
+			\right)
+		 \leq C h, \label{eqn:BeforeConclusion}
+	\end{align}
+	for each $j \in \{0,\dots, N\}$.
+	Since $Nh\leq T$ and combining bounds \eqref{eqn:SumDiffusion} 
+	and \eqref{eqn:BeforeConclusion}, we conclude the proof. \qed
+%======================================================================================================================
+%                                                 STEP 5                                                              %
+%======================================================================================================================
+
+	We can now state  the strong convergence theorem  for the  explicit Linear Steklov method.%
+%We are now in a position to execute the \textbf{Step 5}.
+\begin{thm}
+	Assume \Cref{ass:OSLC,ass:ajBound,ass:HypThmSingularities} hold, consider the 
+	explicit \SM method \eqref{m1}-\eqref{eqn:SolutionFunctions} for SDE \eqref{eqn:SDE1}.
+	Then there exist a continuous-time extension $\overline{Y}(t)$ of the LS solution
+	 $\{Y_k\}$ for which $\overline{Y}(t)=Y_k$ and
+	\begin{equation*}
+		\lim_{h\rightarrow0}\Big[\sup_{0\leq t\leq T} |\overline{Y}(t) - y(t)|^2\Big]=0.
+	\end{equation*}
+\end{thm}
+\begin{pf}
+	First, we bound  the mean square error of the Steklov approximation as follows
+	\begin{align}\label{eqn:AfterTriangle}
+		\EX{\sup_{0\leq t \leq T}|\overline{Y}(t) - y(t)|^2}
+		&\leq
+		2\EX{
+			\sup_{0\leq t \leq T}
+			|\overline{Y}(t) - y_h(t)|^2
+		}
+		+
+		2\EX{
+			\sup_{0\leq t \leq T}
+			|y_h(t) - y(t)|^2
+		}.
+	\end{align}
+	 By lemma \ref{lem:BoundAndConvergenceOfyh}, the solution of the modified SDE \eqref{eqn:PerturbedHighamSDE}, $y_h$, has
+	$p$-bounded moments ($p\geq 2$), and by corollary \ref{col:ContinuousExtBoundedMoments}, 
+	the \SM continuous extension for the SDE \eqref{eqn:SDE1}, $\overline{Y}(t)$, 
+	has bounded moments and it is equivalent to the EM extension for the modified SDE 
+	\eqref{eqn:PerturbedHighamSDE}. Hence, we can apply 
+	theorem	\ref{thm:HighamMaoStuart} to conclude that
+	\begin{equation}\label{eqn:FirstTermZeroLim}
+		\lim_{h\to 0}
+		\EX{
+			\sup_{0\leq t \leq T}
+			|\overline{Y}(t) - y_h(t)|^2
+		} = 0,
+	\end{equation}
+	 meanwhile by lemma \ref{lem:BoundAndConvergenceOfyh},
+	\begin{equation}\label{eqn:SeconTermZeroLim}
+		\lim_{h\to 0}
+		\EX{
+			\sup_{0\leq t \leq T}
+			|y_h(t) - y(t)|^2
+		} = 0.
+	\end{equation}
+	Combining limits \eqref{eqn:FirstTermZeroLim} and \eqref{eqn:SeconTermZeroLim} with 
+	inequality \eqref{eqn:AfterTriangle}, we have the desired conclusion. \qed
+\end{pf}
+%
+%********************************************************************************************
+%              Section 6
+%********************************************************************************************
+
