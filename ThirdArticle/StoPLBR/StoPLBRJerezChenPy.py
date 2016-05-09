@@ -1,16 +1,14 @@
 import numpy as np
-import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 from StoPLBRJerezChen import StoPLBRM
-from matplotlib.pyplot import flag
-import matplotlib.animation as animation
-# Model parameters -----------------------------------------------------------------------------------------------------
-a1 = 0.3			#Estos son los parametros del modelo ai = \alpha_i
+
+# Model parameters ----------------------------------------------------
+a1 = 0  # Model's parameters
 a2 = 0.18
 b1 = 0.2
 b2 = 0.02
 
-ns = 0.1			#Amplitud del ruido
+ns = 0.1 # Noise Amplitude
 gamma1 = -0.9
 gamma2 = 0.5
 #
@@ -19,8 +17,8 @@ r=603
 rSto = 745
 k2 = 0.0000038
 k1 =  r*k2
-U0=[10, 0.7]			#Condicion inicial
-#Stencil Parameters
+U0=[10, 0.7]    # Initial Condition
+# Stencil Parameters
 k = 5
 p = 0
 r = p
