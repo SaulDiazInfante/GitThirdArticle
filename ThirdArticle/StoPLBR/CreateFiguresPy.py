@@ -39,7 +39,7 @@ def fig_cells():
     # Pots Vs Time
     plt.close()
     w = 1.0
-    fig_width_pt = 538.58 * w    # \showthe\columnwidth(190mm)
+    fig_width_pt = 538.58 * w    # \columnwidth(190mm)
     inches_per_pt = 1.0 / 72.27    # Convert pt to inch
     golden_mean = (np.sqrt(5) - 1.0) / 2.0    # Aesthetic ratio
     fig_width = fig_width_pt * inches_per_pt    # width in inches
@@ -458,7 +458,8 @@ def fig_phase_potrait():
 
 
 def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
-                        file_name2="PhasePotrait3d(b).eps"):
+                        file_name2="PhasePotrait3d(b).eps",
+                        file_name3="PhasePotrait3d.eps"):
     urk = np.load('SolutionDet.npy')
     ussls = np.load('OneLongPathSolutionSto.npy')
     detuas = np.load('SolutionDetAs.npy')
@@ -475,7 +476,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
 
     plt.close()
     w = 1.0
-    fig_width_mm = 63.5 * w                      # 63.5 mm
+    fig_width_mm = 60 * w                      # 63.5 mm
     inches_per_mm = 1.0 / 25.4                   # Convert mm to inch
     golden_mean = (np.sqrt(5) - 1.0) / 2.0       # Aesthetic ratio
     fig_width = fig_width_mm * inches_per_mm     # width in inches
@@ -531,7 +532,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax1.xaxis._axinfo['label']['space_factor'] = 2.75
 #
     ax1.yaxis.set_ticks(np.arange(t[0], t[-1], 1500))
-    ax1.set_ylabel(r'$t$')
+    ax1.set_ylabel(r'$t$ (days)')
     plt.tight_layout()
     axbox = ax1.get_position()
     x_value = .49    # Offset by eye
@@ -587,6 +588,114 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
                numpoints=1)
     plt.savefig(file_name2, bbox_inches='tight')
 # ---------------------------------------------------------------------
+# Format 120 mm
+# ---------------------------------------------------------------------
+    plt.close()
+    w = 1.0
+    fig_width_mm = 120 * w                       # 120 mm
+    inches_per_mm = 1.0 / 25.4                   # Convert mm to inch
+    golden_mean = (np.sqrt(5) - 1.0) / 2.0       # Aesthetic ratio
+    fig_width = fig_width_mm * inches_per_mm     # width in inches
+    fig_height = fig_width * golden_mean         # height in inches
+    fig_size = [fig_width, fig_height]
+    params = {
+        'backend': 'ps',
+        'axes.labelsize': 10,
+        'text.fontsize': 10,
+        'legend.fontsize': 8,
+        'xtick.labelsize': 8,
+        'ytick.labelsize': 8,
+        'text.usetex': True,
+        'figure.figsize': fig_size
+    }
+    rcParams.update(params)
+    #
+    fig3 = plt.figure()
+    ax3 = fig3.add_subplot(1, 2, 1, projection='3d')
+    ax3.frameon = False
+    ax3.zaxis.set_rotate_label(False)
+    ax3.set_xlabel(r'$OC(u)$')
+    ax3.set_zlabel(r'$OB(v)$', rotation=90)
+    #
+    ax3.spines['top'].set_visible(False)
+    ax3.spines['right'].set_visible(True)
+    ax3.spines['bottom'].set_visible(True)
+    ax3.spines['left'].set_visible(True)
+    yzmax = np.max(
+        [ussls[0:short, 2].max(),
+         urk[0:short, 2].max(),
+         detuas[0:short, 2].max()]
+    )
+    ax3.set_zlim([-200, yzmax])
+    ax3.view_init(elev=20., azim=-143)
+    #
+    ax3.plot(urk[0:short, 1], t, urk[0:short, 2],
+             color=det_color,
+             lw=1,
+             linestyle='-',
+             label='Det. Short Time'
+             )
+    ax3.plot(ussls[0:short, 1], t, ussls[0:short, 2],
+             color=sto_color,
+             lw=1,
+             linestyle='-',
+             # marker='.',
+             ms=1,
+             mfc='none',
+             label='Sto. Short Time'
+             )
+    ax3.zaxis._axinfo['label']['space_factor'] = 1.75
+    ax3.yaxis._axinfo['label']['space_factor'] = 2.5
+    ax3.xaxis._axinfo['label']['space_factor'] = 2.75
+    #
+    ax3.yaxis.set_ticks(np.arange(t[0], t[-1], 1500))
+    ax3.set_ylabel(r'$t$ (days)')
+    axbox = ax3.get_position()
+    x_value = .19  # Offset by eye
+    y_value = .7
+    ax3.legend(loc=(axbox.x0 + x_value, axbox.y0 + y_value),
+               numpoints=1)
+
+    ax4 = fig3.add_subplot(1, 2, 2, projection='3d')
+    ax4.spines['top'].set_visible(False)
+    ax4.spines['right'].set_visible(True)
+    ax4.spines['bottom'].set_visible(True)
+    ax4.spines['left'].set_visible(True)
+    ax4.plot(detuas[0:short, 1], ussls[-1 - short:-1, 0],
+             detuas[0:short, 2],
+             color=det_color,
+             lw=1,
+             linestyle='-',
+             label='Det Long Time'
+             )
+    ax4.plot(ussls[-short:-1:offset, 1],
+             ussls[-short:-1:offset, 0],
+             ussls[-short:-1:offset, 2],
+             color=sto_color,
+             lw=1,
+             linestyle='-',
+             # marker='.',
+             ms=1,
+             label="Sto. Long Time"
+             )
+    ax4.yaxis.set_ticks(np.arange(tas[0], tas[-1], 1500))
+    ax4.zaxis._axinfo['label']['space_factor'] = 1.75
+    ax4.yaxis._axinfo['label']['space_factor'] = 2.75
+    ax4.xaxis._axinfo['label']['space_factor'] = 2.75
+    ax4.set_xlabel(r'$OC(u)$')
+    ax4.set_ylabel(r'$t$ (days)')
+    ax4.zaxis.set_rotate_label(False)
+    ax4.set_zlabel(r'$OB(v)$', rotation=90)
+    ax4.zaxis.set_rotate_label(False)
+    ax4.set_zlim([-200, yzmax])
+    ax4.set_ylim([tas[0] - 200, tas[-1] + 200])
+    ax4.view_init(elev=20., azim=-145)
+    axbox = ax4.get_position()
+    x_value = -.2  # Offset by eye
+    y_value = .7
+    ax4.legend(loc=(axbox.x0 + x_value, axbox.y0 + y_value),
+               numpoints=1)
+    plt.savefig(file_name3, bbox_inches='tight')
 
 
 def fig_long_path(file_name1="LongPath.eps",
@@ -705,7 +814,7 @@ def fig_long_path(file_name1="LongPath.eps",
 # ====================================================================
     fig3, (ax5, ax6) = plt.subplots(nrows=2)
     ax5 = plt.subplot(211)
-    ax5.set_xlabel(r'$t$')
+    ax5.set_xlabel(r'$t$ (days)')
     ax5.set_ylabel(r'$OC(u)$')
     ax5.set_xlim([-200, 650 * 50])
     ax5.plot(
@@ -760,7 +869,7 @@ def fig_long_path(file_name1="LongPath.eps",
         ec="0.5"
     )
     ax6 = plt.subplot(212)
-    ax6.set_xlabel(r'$t$')
+    ax6.set_xlabel(r'$t$ (days)')
     ax6.set_ylabel(r'$OB(v)$')
     ax6.set_xlim([-200, 650 * 50])
     ax6.plot(
@@ -817,7 +926,7 @@ def fig_long_path(file_name1="LongPath.eps",
     rcParams.update(params)
 # ======================================================================
     fig4, ax7 = plt.subplots()
-    ax7.set_xlabel(r'$t$')
+    ax7.set_xlabel(r'$t$ (days)')
     ax7.set_ylabel(r'$OC(u)$')
     ax7.set_xlim([-200, 650 * 50])
     ax7.plot(
@@ -875,7 +984,7 @@ def fig_long_path(file_name1="LongPath.eps",
     plt.close()
     rcParams.update(params)
     fig5, ax8 = plt.subplots()
-    ax8.set_xlabel(r'$t$')
+    ax8.set_xlabel(r'$t$ (days)')
     ax8.set_ylabel(r'$OB(v)$')
     ax8.set_xlim([-200, 650 * 50])
     ax8.plot(t, j1,
@@ -930,7 +1039,7 @@ def fig_long_path(file_name1="LongPath.eps",
 #    ================================================================
 
 
-def fig_bone_mass():
+def fig_bone_mass(file_name='BoneMass.eps'):
     z = np.load('BoneMass.npy')
     t = z[:, 0]
     z_det = z[:, 1]
@@ -956,7 +1065,9 @@ def fig_bone_mass():
 #    color2 = colorPallete[1]
     color3 = color_pallet[2]
     color4 = color_pallet[3]
-
+    det_color = color1
+    sto_color = color3
+    line_color = color4
     plt.close()
     rcParams.update(params)
     plt.figure()
@@ -964,29 +1075,29 @@ def fig_bone_mass():
     plt.ylabel(r'Bone mass (z)')
     plt.xlim([0, 5000])
     plt.plot(t, 100 * np.ones(t.shape[0]),
-             color=color4,
+             color=line_color,
              lw=.5,
              linestyle=':'
              )
     plt.plot(t, 100 * z_det,
-             color=color1,
+             color=det_color,
              lw=1,
              linestyle='-',
              label='Deterministic'
              )
     plt.plot(t, 100 * z_sto,
-             color=color3,
+             color=sto_color,
              lw=1,
              linestyle='-',
              label='Stochastic'
              )
     plt.legend(loc=0)
     plt.tight_layout()
-    plt.savefig("BoneMass.eps")
+    plt.savefig(file_name)
 #
 
 
-def fig_short_time_moments():
+def fig_short_time_moments(file_name="ShortPathMoments.eps"):
     mean_short = np.load('MeanUShortTime.npy')
     ms_short = np.load('MSUShortTime.npy')
     u1_mean = mean_short[:, 0]
@@ -1000,9 +1111,11 @@ def fig_short_time_moments():
     color2 = color_pallet[1]
     color3 = color_pallet[2]
     color4 = color_pallet[3]
+    mean_color = color2
+    ms_color = color4
     plt.close()
     w = 1.0
-    fig_width_pt = 120 * w    # \columnwidth(190mm)
+    fig_width_pt = 120 * w    # 120 mm
     inches_per_pt = 1.0 / 25.4    # Convert pt to inch
     golden_mean = (np.sqrt(5) - 1.0) / 2.0    # Aesthetic ratio
     fig_width = fig_width_pt * inches_per_pt    # width in inches
@@ -1019,36 +1132,36 @@ def fig_short_time_moments():
     rcParams.update(params)
     fig = plt.figure()
     ax1 = plt.subplot(221)
-    ax1.set_xlabel(r'$t$')
+    ax1.set_xlabel(r'$t$ (days)')
     ax1.set_ylabel(r'$OC(u)$')
     ax1.set_xlim([0, 5200])
     ax1.plot(t, u1_mean,
-             color=color2,
+             color=mean_color,
              lw=1.0,
              linestyle='-',
              label=r'Mean Short'
              )
     ax1.plot(t, u1_ms,
-             color=color4,
+             color=ms_color,
              lw=1.0,
              linestyle='-',
              label='MS-Short'
              )
-    ax1.legend(loc=0)
+    # ax1.legend(loc=0)
 #
     ax2 = plt.subplot(223)
-    ax2.set_xlabel(r'$t$')
+    ax2.set_xlabel(r'$t$ (days)')
     ax2.set_ylabel(r'$OB(v)$')
     ax2.set_xlim([0, 5200])
     ax2.plot(t, u2_mean,
-             color=color2,
+             color=mean_color,
              lw=1.0,
              linestyle='-',
              label=r'Mean Short'
              )
 #
     ax2.plot(t, u2_ms,
-             color=color4,
+             color=ms_color,
              lw=1,
              linestyle='-',
              label='MS-Short'
@@ -1059,13 +1172,13 @@ def fig_short_time_moments():
     ax3.set_xlabel(r'$OC(u)$')
     ax3.set_ylabel(r'$OB(v)$')
     ax3.plot(u1_mean, u2_mean,
-             color=color2,
+             color=mean_color,
              lw=1.0,
              linestyle='-',
              label='Mean Short'
              )
     ax3.plot(u1_ms, u2_ms,
-             color=color4,
+             color=ms_color,
              lw=1.0,
              linestyle='-',
              marker='.',
@@ -1077,12 +1190,11 @@ def fig_short_time_moments():
     ax3.grid(True)
 #
     plt.tight_layout()
-    plt.savefig("ShortPathMoments.eps")
-    plt.show()
+    plt.savefig(file_name)
 #
 
 
-def fig_long_time_moments():
+def fig_long_time_moments(file_name="LongPathMoments.eps"):
     mean_long = np.load('MeanULongTime.npy')
     ms_long = np.load('MSULongTime.npy')
     u1_mean = mean_long[:, 0]
@@ -1097,7 +1209,8 @@ def fig_long_time_moments():
     color2 = color_pallet[1]
     # color3 = color_pallet[2]
     color4 = color_pallet[3]
-
+    mean_color = color2
+    ms_color = color4
     w = 1.0
     fig_width_pt = 120 * w    # \columnwidth(190mm)
     inches_per_pt = 1.0 / 25.4    # Convert pt to inch
@@ -1114,38 +1227,37 @@ def fig_long_time_moments():
               'text.usetex': True,
               'figure.figsize': fig_size}
     rcParams.update(params)
-
 #    fig = plt.figure()
     ax1 = plt.subplot(221)
-    ax1.set_xlabel(r'$t$')
+    ax1.set_xlabel(r'$t$ (days)')
     ax1.set_ylabel(r'$OC(u)$')
     ax1.set_xlim([31200, 36400])
     ax1.plot(t, u1_mean,
-             color=color2,
+             color=mean_color,
              lw=1.0,
              linestyle='-',
              label='Mean-Long'
              )
     ax1.plot(t, u1_ms,
-             color=color4,
+             color=ms_color,
              lw=1.0,
              linestyle='-',
              label='MS-Long'
              )
-    ax1.legend(loc=0)
+    # ax1.legend(loc=0)
 #
     ax2 = plt.subplot(223)
-    ax2.set_xlabel(r'$t$')
+    ax2.set_xlabel(r'$t$ (days)')
     ax2.set_ylabel(r'$OB(v)$')
     ax2.set_xlim([31200, 36400])
     ax2.plot(t, u2_mean,
-             color=color2,
+             color=mean_color,
              lw=1.0,
              linestyle='-',
              label='Mean-Long'
              )
     ax2.plot(t, u2_ms,
-             color=color4,
+             color=ms_color,
              lw=1.0,
              linestyle='-',
              label='MS-Long'
@@ -1158,13 +1270,13 @@ def fig_long_time_moments():
     # ax3.set_xlim([-5,40])
     # ax3.set_ylim([-200, 12700])
     ax3.plot(u1_mean, u2_mean,
-             color=color2,
+             color=mean_color,
              lw=1.0,
              linestyle='-',
              label='Mean-Long'
              )
     ax3.plot(u1_ms, u2_ms,
-             color=color4,
+             color=ms_color,
              lw=1.0,
              linestyle='-',
              marker='.',
@@ -1176,9 +1288,10 @@ def fig_long_time_moments():
     ax3.grid(True)
 #
     plt.tight_layout()
-    plt.savefig("LongPathMoments.eps")
+    plt.savefig(file_name)
 
-# Model parameters ---------------------------------------------------
+#     Model parameters
+# ---------------------------------------------------
 a1 = 0.3        # Model parameters  ai = \alpha_i
 a2 = 0.18
 b1 = 0.2
@@ -1207,12 +1320,14 @@ StoPlbrmJC.InitializeMesh(k, p, r, T0, T)
 StoPlbrmJC.NoiseUpdate(123456789)
 StoPlbrmJC.SetParametersStoPLBRM(a1, b1, a2, b2, 1.0,
                                  gamma2, gamma1, 1.0, k1, k2, sigma, U0)
-# color Pallet
-# colorPallete = ['#f0f9e8', '#bae4bc', '#7bccc4', '#2b8cbe']
-# colorPallete = ['#F6372D', '#202529', '#F6A178', '#C6E0F1']
+# color_pallet
+# color_pallet = ['#f0f9e8', '#bae4bc', '#7bccc4', '#2b8cbe']
+# color_pallet = ['#F6372D', '#202529', '#F6A178', '#C6E0F1']
 color_pallet = ['#588C7E', '#F2E394', '#F2AE72', '#D96459', '#8C4646']
 fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps",
               file_name3="Fig4.eps")
-fig_phase_potrait3d(file_name1="Fig5.eps", file_name2="Fig6.eps")
-
-
+fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",
+                    file_name3="Fig5.eps")
+fig_bone_mass(file_name='Fig6.eps')
+fig_short_time_moments(file_name="Fig7.eps")
+fig_long_time_moments(file_name="Fig8.eps")
