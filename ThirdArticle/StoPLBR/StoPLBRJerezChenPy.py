@@ -15,11 +15,11 @@ gamma2 = 0.5
 sigma = np.array([ns*b1, ns*b2])
 U0 = [10, 0.7]    # Initial Conditions
 # Stencil Parameters
-k = 25
+k = 16
 p = 0
 r = p
 T0 = 0.0
-T = 650 * 48 # almost 48 periods
+T = 650 * 8 # almost 48 periods
 Ji1 = ((b1 + 0.5 * (sigma[0] ** 2)) / a1) ** (1.0 / gamma1)
 Ji2 = ((b2 + 0.5 * (sigma[1] ** 2)) / a2) ** (1.0 / gamma2)
 print '\n\n'
@@ -58,7 +58,6 @@ for i in np.arange(bunche):
     StoPlbrmJC.set_parameters_sto_plbrm(a1, b1, a2, b2, 1.0,
                                      gamma2, gamma1, 1.0, k1, k2,
                                     sigma, U0)
-
     # seed = np.random.random_integers(1, 123456789)
     # np.random.seed(123456789)
     # StoPlbrmJC.NoiseUpdate(seed, flag=1)
@@ -66,8 +65,6 @@ for i in np.arange(bunche):
     # ussls = StoPlbrmJC.SSLS(seed, U0, fn=1.0)
     # StoPlbrmJC.SaveData()
     StoPlbrmJC.bone_mass()
-    #condition_1 = np.abs(StoPlbrmJC.z.max() - 1) < 0.03
-    #condition_2 = np.abs(StoPlbrmJC.z.min() - .75) < 0.05
     condition_1 = not (StoPlbrmJC.z > 1.04).any()
     condition_2 = not (StoPlbrmJC.z < .73).any()
     if condition_1 and condition_2:
@@ -76,19 +73,20 @@ for i in np.arange(bunche):
         print '\tr:='+str(r_seek) + '\t k2:='+str(k2)
     k2_list.append(k2)
     r_list.append(r_seek)
+    np.save('BoneMass.npy',
+            np.transpose(
+                np.array([t[0:-1:100], StoPlbrmJC.z[0:-1:100]])))
     tag = 'r:='+str(r_seek) + ', k2:='+str(k2)
     file_name = 'parameter_output' + str(j) + '.png'
-    plt.plot(t, 100 * StoPlbrmJC.z, label=tag)
-    plt.plot(t, ones * 100)
-    plt.plot(t, .75 * 100 * ones)
+    plt.plot(t[0: -1: 100], 100 * StoPlbrmJC.z[0:-1:100], label=tag)
+    plt.plot(t[0: -1: 100], ones[0: -1: 100] * 100)
+    plt.plot(t[0: -1: 100], .75 * 100 * ones)
     plt.legend(loc=0)
     plt.savefig(file_name)
     plt.close()
     j += 1
     StoPlbrmJC.print_progress(i + 1, bunche, 'Progress:', 'Complete',
                               bar_length=50, ratio=True)
-    np.save('BoneMass.npy',
-            np.transpose(np.array([t, StoPlbrmJC.z])) )
 '''
 plt.close()
 plt.figure()

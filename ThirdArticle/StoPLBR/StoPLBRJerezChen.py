@@ -53,10 +53,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.ji_1 = ((b1 + 0.5 * (sigma_1 ** 2)) / a1) ** (1.0 / g21)
         self.ji_2 = ((b2 + 0.5 * (sigma_2 ** 2)) / a2) ** (1.0 / g12)
         # arrays for methods
-        self.u_em = np.zeros([self.L, 2])
-        self.u_tem = np.zeros([self.L, 2])
         self.u_rk = np.zeros([self.L, 2])
-        self.u_bem = np.zeros([self.L, 2])
         self.u_ssls = np.zeros([self.L, 2])
         self.u_ssls_det = np.zeros([self.L, 2])
         # Long time simulation
@@ -69,10 +66,13 @@ class StoPLBRM(PLBRMJerezChen):
         self.z = np.zeros(self.L)
         self.z_sto = np.zeros(self.L)
         self.k_t = 0
+        self.det_sol_file_name = 'det_sol.npy'
+        self.bone_mass_file_name = 'det_bone_mass.npy'
 
     # Print iterations progress
-    def print_progress(self, iteration, total, prefix='', suffix='',
-                      decimals=2, bar_length=100, ratio=False):
+    @staticmethod
+    def print_progress(iteration, total, prefix='', suffix='',
+                       decimals=2, bar_length=100, ratio=False):
         """
         Call in a loop to create terminal progress bar
         @params:
@@ -118,11 +118,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.t_k = self.t[self.tau]
         self.Dt = np.float(self.R) * self.dt
         self.L = np.int64(np.float64(self.N) / np.float64(self.R))
-        #
-        self.u_em = np.zeros([self.L, 2])
-        self.u_tem = np.zeros([self.L, 2])
         self.u_rk = np.zeros([self.L, 2])
-        self.u_bem = np.zeros([self.L, 2])
         self.u_ssls = np.zeros([self.L, 2])
         self.u_ssls_det = np.zeros([self.L, 2])
         # Long time simulation
@@ -137,12 +133,10 @@ class StoPLBRM(PLBRMJerezChen):
         self.k_t = 0
     #
     def noise_update(self, flag=True):
-        # flag: boolean
         self.dWj = np.random.randn(2, np.int(self.N))
         self.dWj = np.sqrt(self.dt) * self.dWj
         if flag :
             self.dWj[:, 0] = 0.0
-        #
 
     def set_parameters_sto_plbrm(self, a1, b1, a2, b2, g11, g12, g21,
                                  g22, k1, k2, sigma, u0):
@@ -201,50 +195,7 @@ class StoPLBRM(PLBRMJerezChen):
         fx = self.a(x)
         return h * fx.ravel() + x_0.ravel() - x.ravel()
 
-    def euler(self, flag=0):
-        h = self.Dt
-        l = self.L
-        r = self.R
-        if flag == 1:
-            dt = self.dt
-            l = self.N
-            r = 1
-        self.u_em[0] = self.Uzero
-        for j in np.arange(l - 1):
-            self.w_inc = np.sum(self.dWj[:, r * j:r * (j + 1)], axis=1)
-            self.w_inc = self.w_inc.reshape([2, 1])
-            uj = self.u_em[j, :].reshape([2, 1])
-            aj = self.a(uj)
-            increment = uj + h * aj + np.dot(self.b(uj), self.w_inc)
-            self.u_em[j + 1, :] = increment[:, 0]
-        uem = self.u_em
-        return uem
-
     # noinspection PyTypeChecker
-    def tamed_euler(self, uzero, seed, flag=0):
-        h = self.Dt
-        l = self.L
-        r = self.R
-        ss = 100
-        if flag == 1:
-            d_t = self.dt
-            l = self.N
-            r = 1
-
-        self.u_tem[0] = self.u_zero
-        if uzero.any != self.u_zero.any:
-            self.u_tem[0] = uzero
-        self.noise_update(seed)
-        for j in np.arange(l - 1):
-            self.w_inc = np.sum(self.dWj[:, r * j:r * (j + 1)], axis=1)
-            self.w_inc = self.w_inc.reshape([2, 1])
-            uj = self.u_tem[j, :].reshape([2, 1])
-            aj = h * self.a(uj)
-            increment = uj + aj / (1 + np.linalg.norm(aj)) + np.dot(
-                self.b(uj), self.w_inc)
-            self.u_tem[j + 1, :] = increment[:, 0]
-        u_tem = self.u_tem[0:l:ss, :]
-        return u_tem
 
     def rk(self, uzero=np.array([1.0, 1.0])):
         ss = 1
@@ -264,20 +215,6 @@ class StoPLBRM(PLBRMJerezChen):
         urk = self.u_rk # self.u_rk[0:l:ss, :]
         return urk
 
-    def bem(self):
-        l = self.L
-        r = self.R
-
-        self.u_bem[0] = self.u_zero
-        for j in np.arange(l - 1):
-            self.w_inc = np.sum(self.dWj[:, r * (j): r * (j + 1)],
-                                axis=1)
-            self.w_inc = self.w_inc.reshape([2, 1])
-            uj = self.u_bem[j, :].reshape([2, 1])
-            increment = fsolve(self.ai, uj, args=j).reshape([2, 1])
-            self.u_bem[j + 1, :] = increment[:, 0]
-        u_bem = self.u_bem
-        return u_bem
 
     #
     def ssls(self, seed=123456789, uzero=np.array([1, 1]), fn=1.0):
@@ -330,9 +267,12 @@ class StoPLBRM(PLBRMJerezChen):
             uj2 = uj[1, 0] * np.exp(h * a12)
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             self.u_ssls_det[j + 1, :] = ustar[:, 0]
-            self.print_progress(j, l, 'Progress:',
+            self.print_progress(j+1, l, 'Progress:',
                                 'Complete',
                                 bar_length=50, ratio=True)
+        np.save(self.det_sol_file_name,
+                np.transpose(
+                        np.array([self.t_k, self.u_ssls_det])))
         u_ssls = self.u_ssls
         return u_ssls
     #
@@ -438,6 +378,9 @@ class StoPLBRM(PLBRMJerezChen):
             self.z[j + 1] = self.z[j] + h * increment
             self.print_progress(j + 1, l, 'Bone mass:','Complete',
                                  bar_length=50, ratio=True)
+        np.save(self.bone_mass_file_name,
+                np.transpose(
+                        np.array([self.t_k, self.z])))
             # self.z_sto[j + 1] = self.z_sto[j] + h * z_sto
 
     #
@@ -461,29 +404,10 @@ class StoPLBRM(PLBRMJerezChen):
         # Mu2 = self.M_uls[:,1]
         # MSu1 = self.MS_uls[:,0]
         # MSu2 = self.MS_uls[:,1]
-        tag_par = np.array([
-            'a1=',
-            'b1=',
-            'a2=',
-            'b2=',
-            'g11=',
-            'g12=',
-            'g21=',
-            'g22=',
-            'sigma1',
-            'sigma2',
-            'k1=',
-            'k2=',
-            'Ubar1=',
-            'Ubar2=',
-            'Uzero1=',
-            'Uzero2=',
-            'k=',
-            'T0=',
-            'N=',
-            'T=',
-            'dt='
-            ])
+        tag_par = np.array(['a1=', 'b1=', 'a2=', 'b2=', 'g11=', 'g12=',
+                            'g21=', 'g22=', 'sigma1', 'sigma2', 'k1=',
+                            'k2=', 'Ubar1=', 'Ubar2=', 'Uzero1=',
+                            'Uzero2=', 'k=', 'T0=', 'N=', 'T=', 'dt='])
         par_values = np.array([
             self.a1,
             self.b1,
