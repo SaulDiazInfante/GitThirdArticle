@@ -19,3 +19,8 @@ c = [0.0333333333333333333333333333333333333333333333333333333333333,
 c = np.array(c, dtype=np.float64)
 file_name = 'rk8(10)_c_coefficients.npy'
 np.save(file_name, c)
+c_hat = c
+c[1] = 1.0/36.0
+c[15] = -1.0/36.0
+file_name = 'rk8(10)_c_hat__coefficients.npy'
+np.save(file_name, c_hat)

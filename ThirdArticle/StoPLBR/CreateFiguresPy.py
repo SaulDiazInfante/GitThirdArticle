@@ -1,3 +1,16 @@
+import numpy as np
+import matplotlib as mpl
+mpl.use('PS')
+import matplotlib.lines as mlines
+import matplotlib.pyplot as plt
+
+from StoPLBRJerezChen import StoPLBRM
+from matplotlib import rcParams
+from mpl_toolkits.mplot3d import Axes3D
+# from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+
 """
 # ===============================================================================
 # Code for create the eps-figures of the Article:
@@ -15,19 +28,6 @@
 #   PhasePotrait.eps, PhasePotrait3d.eps
 # ===============================================================================
 """
-import numpy as np
-import matplotlib.lines as mlines
-import matplotlib.pyplot as plt
-from StoPLBRJerezChen import StoPLBRM
-# from matplotlib.pyplot import flag
-# from matplotlib import colors
-from matplotlib import rcParams
-from mpl_toolkits.mplot3d import Axes3D
-# from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
-from mpl_toolkits.axes_grid1.inset_locator import mark_inset
-from mpl_toolkits.axes_grid1.inset_locator import inset_axes
-# import matplotlib.animation as animation
-# ---------------------------------------------------------------------
 
 
 def fig_cells():
@@ -490,6 +490,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
         'xtick.labelsize': 8,
         'ytick.labelsize': 8,
         'text.usetex': True,
+        'text.latex.unicode': False,
         'figure.figsize': fig_size
     }
     rcParams.update(params)
@@ -698,9 +699,9 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     plt.savefig(file_name3, bbox_inches='tight')
 
 
-def fig_long_path(file_name1="LongPath.eps",
-                  file_name2="LongPathXi.eps",
-                  file_name3="PathHalfTime.eps"):
+def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
+                  file_name3='Fig4.eps'):
+    # type: (object, object, object) -> object
     ussls = np.load("OneLongPathSolutionSto.npy")
     urk = np.load("OneLongPathSolutionDet.npy")
     t = ussls[:, 0]
@@ -718,29 +719,13 @@ def fig_long_path(file_name1="LongPath.eps",
     ji_color = color5
     plt.close()
 # EPS setup
-    w = 1.0
-    fig_width_pt = 120 * w                      # 120 mm
-    inches_per_mm = 1.0 / 25.4                  # Convert mm to inch
-    golden_mean = (np.sqrt(5) - 1.0) / 2.0      # Aesthetic ratio
-    fig_width = fig_width_pt * inches_per_mm    # width in inches
-    fig_height = fig_width * golden_mean        # height in inches
-    fig_size = [fig_width, fig_height]
-    params = {
-        'backend': 'ps',
-        'axes.labelsize': 10,
-        'text.fontsize': 10,
-        'legend.fontsize': 8,
-        'xtick.labelsize': 8,
-        'ytick.labelsize': 8,
-        'text.usetex': True,
-        'figure.figsize': fig_size}
-    rcParams.update(params)
+
     fig1, (ax1, ax2) = plt.subplots(nrows=2)
 #
     ax1 = plt.subplot(211)
     # ax1.set_xlabel(r'$t$ (days)')
     ax1.set_ylabel(r'$OC(u)$')
-    ax1.set_xlim([-200, 650 * 50])
+    ax1.set_xlim([-200, 650 * 48])
     ax1.plot(t, ussls[:, 1],
              color=sto_color,
              lw=.5,
@@ -751,7 +736,7 @@ def fig_long_path(file_name1="LongPath.eps",
     ax2 = plt.subplot(212)
     ax2.set_xlabel(r'$t$ (days)')
     ax2.set_ylabel(r'$OB(v)$')
-    ax2.set_xlim([-200, 650 * 50])
+    ax2.set_xlim([-200, 650 * 48])
     ax2.plot(t, ussls[:, 2],
              color=sto_color,
              lw=.5,
@@ -922,9 +907,8 @@ def fig_long_path(file_name1="LongPath.eps",
 #       Second Format of Xi figures
 #
 # =====================================================================
-    plt.close()
-    rcParams.update(params)
-# ======================================================================
+#
+# =====================================================================
     fig4, ax7 = plt.subplots()
     ax7.set_xlabel(r'$t$ (days)')
     ax7.set_ylabel(r'$OC(u)$')
@@ -981,8 +965,6 @@ def fig_long_path(file_name1="LongPath.eps",
     plt.tight_layout()
     plt.savefig("LongPath(OCs).eps")
 # ==============================================================
-    plt.close()
-    rcParams.update(params)
     fig5, ax8 = plt.subplots()
     ax8.set_xlabel(r'$t$ (days)')
     ax8.set_ylabel(r'$OB(v)$')
@@ -1094,7 +1076,7 @@ def fig_bone_mass(file_name='BoneMass.eps'):
     plt.legend(loc=0)
     plt.tight_layout()
     plt.savefig(file_name)
-#
+#object
 
 
 def fig_short_time_moments(file_name="ShortPathMoments.eps"):
@@ -1195,6 +1177,7 @@ def fig_short_time_moments(file_name="ShortPathMoments.eps"):
 
 
 def fig_long_time_moments(file_name="LongPathMoments.eps"):
+    # type: (string) -> archive.eps
     mean_long = np.load('MeanULongTime.npy')
     ms_long = np.load('MSULongTime.npy')
     u1_mean = mean_long[:, 0]
@@ -1227,7 +1210,7 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
               'text.usetex': True,
               'figure.figsize': fig_size}
     rcParams.update(params)
-#    fig = plt.figure()
+    fig = plt.figure()
     ax1 = plt.subplot(221)
     ax1.set_xlabel(r'$t$ (days)')
     ax1.set_ylabel(r'$OC(u)$')
@@ -1287,8 +1270,10 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
     ax3.legend(loc=0)
     ax3.grid(True)
 #
-    plt.tight_layout()
-    plt.savefig(file_name)
+    fig.set_tight_layout(True)
+    # plt.tight_layout()
+    plt.savefig(file_name, format='eps', dpi=1000)
+
 
 #     Model parameters
 # ---------------------------------------------------
@@ -1316,18 +1301,36 @@ T = 650 * 8
 LTM = 5
 #
 StoPlbrmJC = StoPLBRM()
-StoPlbrmJC.InitializeMesh(k, p, r, T0, T)
-StoPlbrmJC.NoiseUpdate(123456789)
-StoPlbrmJC.SetParametersStoPLBRM(a1, b1, a2, b2, 1.0,
-                                 gamma2, gamma1, 1.0, k1, k2, sigma, U0)
+StoPlbrmJC.initialize_mesh(k, p, r, T0, T)
+StoPlbrmJC.noise_update(123456789)
+StoPlbrmJC.set_parameters_sto_plbrm(a1, b1, a2, b2, 1.0,
+                                    gamma2, gamma1, 1.0, k1, k2, sigma, U0)
 # color_pallet
 # color_pallet = ['#f0f9e8', '#bae4bc', '#7bccc4', '#2b8cbe']
 # color_pallet = ['#F6372D', '#202529', '#F6A178', '#C6E0F1']
 color_pallet = ['#588C7E', '#F2E394', '#F2AE72', '#D96459', '#8C4646']
+w = 1.0
+fig_width_mm = 120 * w  # 120 mm
+inches_per_mm = 1.0 / 25.4  # Convert mm to inch
+golden_mean = (np.sqrt(5) - 1.0) / 2.0  # Aesthetic ratio
+fig_width = fig_width_mm * inches_per_mm  # width in inches
+fig_height = fig_width * golden_mean  # height in inches
+fig_size = [fig_width, fig_height]
+params = {
+    'axes.labelsize': 10,
+    'font.size': 10,
+    'legend.fontsize': 8,
+    'xtick.labelsize': 8,
+    'ytick.labelsize': 8,
+    'text.usetex': True,
+    'figure.figsize': fig_size}
+rcParams.update(params)
+
+#
 fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps",
               file_name3="Fig4.eps")
-fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",
-                    file_name3="Fig5.eps")
-fig_bone_mass(file_name='Fig6.eps')
-fig_short_time_moments(file_name="Fig7.eps")
-fig_long_time_moments(file_name="Fig8.eps")
+# fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",
+#                     file_name3="Fig5.eps")
+# fig_bone_mass(file_name='Fig6.eps')
+# fig_short_time_moments(file_name="Fig7.eps")
+# fig_long_time_moments(file_name="Fig8.eps")

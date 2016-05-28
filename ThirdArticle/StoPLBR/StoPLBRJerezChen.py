@@ -113,6 +113,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.R = np.int64(2 ** r)
         self.T = t_f
         self.dt = self.T / np.float(self.N)
+        self.IndexN = np.arange(self.N, dtype=np.uint64)
         self.tau = self.IndexN[0:self.N:self.P]
         self.t = np.linspace(0, self.T, self.N , dtype=np.float32)
         self.t_k = self.t[self.tau]
@@ -279,13 +280,12 @@ class StoPLBRM(PLBRMJerezChen):
 
     def long_time_behavior(self, seed, k_times=1):
         """
-
         :type k_times: np.int64
         :type seed: np.float32
         """
         self.long_time_m = np.int64(k_times)
         for j in np.arange(k_times):
-            self.u_as[0] = self.Ussls[-1]
+            self.u_as[0] = self.u_ssls[-1]
             self.det_uas[0] = self.u_rk[-1]
             self.noise_update(flag=False)
             self.u_as = self.ssls(seed, self.u_as[0])
@@ -313,7 +313,6 @@ class StoPLBRM(PLBRMJerezChen):
         """
         z = - k1 * np.sqrt(np.abs(u - ji_2)) \
             + k2 * np.sqrt(np.abs(v - ji_1))
-
         z = - k1 * np.max([0.0, u - u0]) \
             + k2 * np.max([0.0, v - v0])
         """

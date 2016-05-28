@@ -129,9 +129,9 @@ index_i = np.array(index_i, dtype=np.uint8)
 index_j = np.array(index_j, dtype=np.uint8)
 beta_ij = np.array(beta_ij, dtype=np.float128)
 beta = coo_matrix((beta_ij, (index_i, index_j)),
-                     shape=(111, 111)).toarray()
+                     shape=(111, 111), dtype=np.float128).toarray()
 file_name = 'rk8(10)_beta_coefficients.npy'
 
 
-np.save(file_name,beta_ij)
+np.save(file_name, beta)
 print(str.format('{0:.60f}', beta[16, 5]))
