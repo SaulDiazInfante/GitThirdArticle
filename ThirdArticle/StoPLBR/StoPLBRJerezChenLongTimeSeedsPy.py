@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from StoPLBRJerezChen import StoPLBRM
 import time
 w = 1.0
-fig_width_mm = 120 * w  # 120 mm
+fig_width_mm = 170 * w  # 120 mm
 inches_per_mm = 1.0 / 25.4  # Convert mm to inch
 golden_mean = (np.sqrt(5) - 1.0) / 2.0  # Aesthetic ratio
 fig_width = fig_width_mm * inches_per_mm  # width in inches
@@ -50,7 +50,6 @@ color2 = color_pallet[1]
 color3 = color_pallet[2]
 color4 = color_pallet[3]
 color5 = color_pallet[4]
-sto_color = color3
 det_color = color1
 i = 1
 for j in seeds:
@@ -71,15 +70,14 @@ for j in seeds:
     u_ssls = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
     # ---------------Long Path----------------------------------------
     seed_prefix = str(seed)
-    file_name1 = 'OB-OC-1-' + seed_prefix
-    file_name2 = 'OB-OC-2-' + seed_prefix
+    file_name1 = 'OB-OC-' + seed_prefix
     file_name1 += '.eps'
-    file_name2 += '.eps'
     t = StoPlbrmJC.t_k
     #
-    fig1, (ax1, ax2) = plt.subplots(nrows=2)
+    fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     #
-    ax1 = plt.subplot(211)
+    sto_color = color3
+    ax1 = plt.subplot(221)
     # ax1.set_xlabel(r'$t$ (days)')
     ax1.set_ylabel(r'Number of OCs')
     ax1.set_xlim([-200, 650 * 48])
@@ -90,40 +88,34 @@ for j in seeds:
              label='Deterministic'
              )
     ax1.grid(False)
-    ax2 = plt.subplot(212)
-    ax2.set_xlabel(r'$t$ (days)')
-    ax2.set_ylabel(r'Number of OBs')
-    ax2.set_xlim([-200, 650 * 48])
-    ax2.plot(t, u_ssls[:, 1],
-             color=sto_color,
-             lw=.5,
-             linestyle='-',
-             label='Deterministic'
-             )
-    ax2.grid(False)
-    plt.tight_layout()
-    plt.savefig(file_name1, resolution=1000)
-    plt.close()
-    # --------------------------------------------------------------------------
-    # Second Path
-    #
-    # --------------------------------------------------------------------------
-    StoPlbrmJC.noise_update()
-    u_ssls = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
-    fig2, (ax3, ax4) = plt.subplots(nrows=2)
-    #
-    ax3 = plt.subplot(211)
+    ax3 = plt.subplot(223)
     # ax1.set_xlabel(r'$t$ (days)')
     ax3.set_ylabel(r'Number of OCs')
     ax3.set_xlim([-200, 650 * 48])
-    ax3.plot(t, u_ssls[:, 0],
+    ax3.plot(t, u_ssls[:, 1],
              color=sto_color,
              lw=.5,
              linestyle='-',
              label='Deterministic'
              )
     ax3.grid(False)
-    ax4 = plt.subplot(212)
+    #
+    StoPlbrmJC.noise_update()
+    u_ssls = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
+    sto_color = color5
+    ax2 = plt.subplot(222)
+    ax2.set_xlabel(r'$t$ (days)')
+    ax2.set_ylabel(r'Number of OBs')
+    ax2.set_xlim([-200, 650 * 48])
+    ax2.plot(t, u_ssls[:, 0],
+             color=sto_color,
+             lw=.5,
+             linestyle='-',
+             label='Deterministic'
+             )
+    ax2.grid(False)
+
+    ax4 = plt.subplot(224)
     ax4.set_xlabel(r'$t$ (days)')
     ax4.set_ylabel(r'Number of OBs')
     ax4.set_xlim([-200, 650 * 48])
@@ -135,7 +127,7 @@ for j in seeds:
              )
     ax4.grid(False)
     plt.tight_layout()
-    plt.savefig(file_name2, resolution=1000)
+    plt.savefig(file_name1, resolution=1000)
     #
     np.save('OneLongPathSolutionSto' + seed_prefix + '(' + str(i) + ')' + '.npy',
              np.transpose(np.array([t, u_ssls[:, 0], u_ssls[:, 1]])))

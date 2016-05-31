@@ -59,7 +59,7 @@ StoPlbrmJC.initialize_mesh(k, p, r, T0, T)
 # u_ssls_ref = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
 for i in seeds:
     seed = i
-    U0 = [10, .7]
+    U0 = [10.0, .7]
     plt.close()
     eps_prefix = str(eps) + '-'
     file_name1 = 'OB-OC-' + eps_prefix + str(seed)
@@ -75,7 +75,8 @@ for i in seeds:
         U0 += j * eps
         StoPlbrmJC.u_zero = U0
         print U0
-        StoPlbrmJC.se
+        StoPlbrmJC.set_parameters_sto_plbrm(a1, b1, a2, b2, 1.0, gamma2,
+                                            gamma1, 1.0, k1, k2, sigma, U0)
         #
         # seed = j
         # ax1.set_xlabel(r'$t$ (days)')
@@ -86,8 +87,7 @@ for i in seeds:
         ax2.set_ylabel(r'Number of OBs')
         ax2.set_xlim([-200, 650 * 48])
         ax2.grid(False)
-        # -----------------t_parameters_sto_plbrm(a1, b1, a2, b2, 1.0, gamma2,
-                                            gamma1, 1.0, k1, k2, sigma, U0)
+        # -----------------
         # StoPlbrmJC.noise_update(seed)
         u_ssls = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
         # ---------------Long Path----------------------------------------
