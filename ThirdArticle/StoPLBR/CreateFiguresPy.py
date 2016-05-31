@@ -1,11 +1,12 @@
 import numpy as np
 import matplotlib as mpl
 mpl.use('PS')
+from matplotlib import rcParams
 import matplotlib.lines as mlines
 import matplotlib.pyplot as plt
 
 from StoPLBRJerezChen import StoPLBRM
-from matplotlib import rcParams
+
 from mpl_toolkits.mplot3d import Axes3D
 # from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
 from mpl_toolkits.axes_grid1.inset_locator import mark_inset
