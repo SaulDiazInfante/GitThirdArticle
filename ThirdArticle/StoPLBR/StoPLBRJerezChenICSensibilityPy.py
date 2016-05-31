@@ -42,7 +42,7 @@ p = 0
 r = p
 T0 = 0.0
 T = 650 * 48
-eps = 1e-4
+eps = [1e-4, 1e-3, 1e-2]
 color_pallet = ['#588C7E', '#F2E394', '#F2AE72', '#D96459', '#8C4646']
 # seeds = []
 seeds = [109966818, 115396582, 114793524]
@@ -53,49 +53,67 @@ color4 = color_pallet[3]
 color5 = color_pallet[4]
 
 det_color = color1
+
 seed = 115396582
 StoPlbrmJC = StoPLBRM()
 StoPlbrmJC.initialize_mesh(k, p, r, T0, T)
-# u_ssls_ref = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
+#
 for i in seeds:
     seed = i
     U0 = [10.0, .7]
+    print '\t\t seed: {:,}'.format(seed)
     plt.close()
     eps_prefix = str(eps) + '-'
     file_name1 = 'OB-OC-' + eps_prefix + str(seed)
     file_name1 += '.eps'
+    t = StoPlbrmJC.t_k
+    u_ssls_ref = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
+    k = 0
+    sto_color = color_pallet[k]
     fig1, (ax1, ax2) = plt.subplots(nrows=2)
     ax1 = plt.subplot(211)
     ax2 = plt.subplot(212)
-    for j in np.arange(3):
+    ax1.set_xlabel(r'$t$ (days)')
+    ax1.set_ylabel(r'Number of OCs')
+    ax1.set_xlim([-200, 650 * 48])
+    ax1.grid(False)
+    ax1.plot(t, u_ssls_ref[:, 0],
+             color=sto_color,
+             lw=.5,
+             linestyle='-',
+             label='reference'
+             )
+    ax2.set_xlabel(r'$t$ (days)')
+    ax2.set_ylabel(r'Number of OBs')
+    ax2.set_xlim([-200, 650 * 48])
+    ax2.grid(False)
+    ax2.plot(t, u_ssls_ref[:, 1],
+             color=sto_color,
+             lw=.5,
+             linestyle='-',
+             label='reference'
+             )
+###################################################3
+    for j in eps:
+        U0 = np.array([10.0, .7])
         np.random.seed(i)
-        # seed = np.random.randint(109730187, 123456789)
-        # np.random.seed(seed)
-        # seeds.append(seed)-----------------------------------------
-        U0 += j * eps
+        StoPlbrmJC.noise_update()
+        U0 += j * np.array([1.0, 1.0])
         StoPlbrmJC.u_zero = U0
-        print U0
-        StoPlbrmJC.set_parameters_sto_plbrm(a1, b1, a2, b2, 1.0, gamma2,
-                                            gamma1, 1.0, k1, k2, sigma, U0)
+        print '\t\tu_zero = [{:.5f}, {:.5f}]'.format(StoPlbrmJC.u_zero[0],StoPlbrmJC.u_zero[1])
+        #StoPlbrmJC.set_parameters_sto_plbrm(a1, b1, a2, b2, 1.0, gamma2,
+        #                                    gamma1, 1.0, k1, k2, sigma, U0)
         #
         # seed = j
-        # ax1.set_xlabel(r'$t$ (days)')
-        ax1.set_ylabel(r'Number of OCs')
-        ax1.set_xlim([-200, 650 * 48])
-        ax1.grid(False)
-        ax2.set_xlabel(r'$t$ (days)')
-        ax2.set_ylabel(r'Number of OBs')
-        ax2.set_xlim([-200, 650 * 48])
-        ax2.grid(False)
         # -----------------
         # StoPlbrmJC.noise_update(seed)
-        u_ssls = StoPlbrmJC.ssls(seed, [1, 1], fn=1.0)
+        u_ssls = StoPlbrmJC.ssls(i, [1, 1], fn=1.0)
         # ---------------Long Path----------------------------------------
-        t = StoPlbrmJC.t_k
+
         #
-        sto_color = color_pallet[j]
-        #
-        label_legend = 'eps:=' + str(j * eps)
+        k += 1
+        sto_color = color_pallet[k]
+        label_legend = r'$\epsilon:=$' + str(j)
         ax1.plot(t, u_ssls[:, 0],
                  color=sto_color,
                  lw=.5,
@@ -110,6 +128,7 @@ for i in seeds:
                  )
         np.save('OneLongPathSolutionSto' + eps_prefix + '.npy',
             np.transpose(np.array([t, u_ssls[:, 0], u_ssls[:, 1]])))
-    plt.legend(loc=0)
+    ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.3),
+              ncol=4, fancybox=True, shadow=True)
     plt.tight_layout()
     plt.savefig(file_name1, resolution=1000)

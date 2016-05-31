@@ -72,11 +72,12 @@ for j in seeds:
     seed_prefix = str(seed)
     file_name1 = 'OB-OC-' + seed_prefix
     file_name1 += '.eps'
+    sto_color = color3
     t = StoPlbrmJC.t_k
     #
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
     #
-    sto_color = color3
+
     ax1 = plt.subplot(221)
     # ax1.set_xlabel(r'$t$ (days)')
     ax1.set_ylabel(r'Number of OCs')
@@ -90,7 +91,7 @@ for j in seeds:
     ax1.grid(False)
     ax3 = plt.subplot(223)
     # ax1.set_xlabel(r'$t$ (days)')
-    ax3.set_ylabel(r'Number of OCs')
+    ax3.set_ylabel(r'Number of OBs')
     ax3.set_xlim([-200, 650 * 48])
     ax3.plot(t, u_ssls[:, 1],
              color=sto_color,
@@ -105,7 +106,7 @@ for j in seeds:
     sto_color = color5
     ax2 = plt.subplot(222)
     ax2.set_xlabel(r'$t$ (days)')
-    ax2.set_ylabel(r'Number of OBs')
+    ax2.set_ylabel(r'Number of OCs')
     ax2.set_xlim([-200, 650 * 48])
     ax2.plot(t, u_ssls[:, 0],
              color=sto_color,
