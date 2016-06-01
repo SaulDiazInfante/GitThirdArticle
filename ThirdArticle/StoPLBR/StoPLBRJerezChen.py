@@ -273,7 +273,7 @@ class StoPLBRM(PLBRMJerezChen):
                                 bar_length=50, ratio=True)
         np.save(self.det_sol_file_name,
                 np.transpose(
-                        np.array([self.t_k, self.u_ssls_det])))
+                        np.array([self.t_k, self.u_ssls_det[:, 0], self.u_ssls_det[:, 1]])))
         u_ssls = self.u_ssls
         return u_ssls
     #

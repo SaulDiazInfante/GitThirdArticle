@@ -42,7 +42,7 @@ p = 0
 r = p
 T0 = 0.0
 T = 650 * 48
-eps = [1e-4, 1e-3, 1e-2]
+eps = [5.0]
 color_pallet = ['#588C7E', '#F2E394', '#F2AE72', '#D96459', '#8C4646']
 # seeds = []
 seeds = [109966818, 115396582, 114793524]
@@ -128,7 +128,7 @@ for i in seeds:
                  )
         np.save('OneLongPathSolutionSto' + eps_prefix + '.npy',
             np.transpose(np.array([t, u_ssls[:, 0], u_ssls[:, 1]])))
-    ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.3),
-              ncol=4, fancybox=True, shadow=True)
+    ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.315),
+              ncol=4, fancybox=False, shadow=False)
     plt.tight_layout()
     plt.savefig(file_name1, resolution=1000)
