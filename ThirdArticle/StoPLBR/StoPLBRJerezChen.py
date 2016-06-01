@@ -5,10 +5,10 @@ from DeterministicModelJerezChen import PLBRMJerezChen
 import sys as Sys
 
 class StoPLBRM(PLBRMJerezChen):
-    def __init__(self, k=18, p=0, r=0, t_0=0, t_f=36250, flag=1,
+    def __init__(self, k=20, p=0, r=0, t_0=0, t_f=36250, flag=1,
                  a1=0.3, b1=0.2, a2=0.18, b2=0.02, g11=1.0, g12=0.5,
                  g21=-0.9, g22=1.0, k1=0.022914, k2=0.0000038,
-                 sigma_1=0.02, sigma_2=0.002, u_0=10.0, v_0=0.7):
+                 sigma_1=0.02, sigma_2=0.002, u_0=10.0, v_0=0.7, seed=114793524):
 
         self.k = k
         self.p = p
@@ -29,7 +29,10 @@ class StoPLBRM(PLBRMJerezChen):
         self.t_k = self.t[self.tau]
         self.Dt = np.float(self.R) * self.dt
         self.L = np.int64(np.float64(self.N) /np.float64(self.R))
-
+        #  random_generator
+        self.seed = seed
+        np.random.seed(seed)
+        self.old_rg_state = np.random.get_state()
         self.dWj = np.random.randn(2, np.int64(self.N))
         self.dWj = np.sqrt(self.dt) * self.dWj
         if flag == 1:
@@ -232,6 +235,10 @@ class StoPLBRM(PLBRMJerezChen):
         self.u_ssls[0] = self.u_zero
         if uzero[0] != 1:
             self.u_ssls[0] = uzero
+        print '\n Stochastic Split Step Linear Steklov:'
+        self.print_progress(0, l, 'Progress:',
+                            'Complete',
+                            bar_length=50, ratio=True)
         for j in np.arange(l - 1):
             self.w_inc = np.sum(self.dWj[:, r * j:r * (j + 1)], axis=1)
             self.w_inc = self.w_inc.reshape([2, 1])
@@ -243,7 +250,11 @@ class StoPLBRM(PLBRMJerezChen):
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             increment = ustar + fn * np.dot(self.b(ustar), self.w_inc)
             self.u_ssls[j + 1, :] = increment[:, 0]
+            self.print_progress(j + 1, l, 'Progress:',
+                                'Complete',
+                                bar_length=50, ratio=True)
         u_ssls = self.u_ssls
+        print'\n'
         return u_ssls
 
     def ssls_det(self):
@@ -444,3 +455,77 @@ class StoPLBRM(PLBRMJerezChen):
         # fmt=['%1.8f','%1.8f','%1.8f'],\
         # delimiter='\t'\
         # )
+
+    def save_parameters(self, file_name1='parameters.txt', file_name2='rg_state.npy'):
+        tag_par = np.array(['a1=', 'b1=', 'a2=', 'b2=', 'g11=', 'g12=', 'g21=', 'g22=', 'sigma1', 'sigma2', 'k1=',
+                            'k2=', 'Ubar1=', 'Ubar2=', 'Uzero1=', 'Uzero2=', 'k=', 'T0=', 'N=', 'T=', 'dt=','xi1=',
+                            'xi2=', 'seed='])
+        par_values = np.array([
+            self.a1,
+            self.b1,
+            self.a2,
+            self.b2,
+            self.g11,
+            self.g12,
+            self.g21,
+            self.g22,
+            self.sigma[0],
+            self.sigma[1],
+            self.k1,
+            self.k2,
+            self.u_bar[0],
+            self.u_bar[1],
+            self.u_zero[0],
+            self.u_zero[1],
+            self.k,
+            self.T0,
+            self.N,
+            self.T,
+            self.dt,
+            self.ji_1,
+            self.ji_2,
+            self.seed
+        ])
+        parameters = np.column_stack((tag_par, par_values))
+        random_generator_state = self.old_rg_state
+        np.savetxt(file_name1, parameters, delimiter="\t", fmt='%s')
+        np.save(file_name2, random_generator_state[1])
+
+    def load_parameters(self, file_name1='parameters.txt', file_name2='rg_state.npy'):
+        data = np.loadtxt(file_name1, usecols=(1,))
+        self.a1 = data[0]
+        self.b1 = data[1]
+        self.a2 = data[2]
+        self.b2 = data[3]
+        self.g11 = data[4]
+        self.g12 = data[5]
+        self.g21 = data[6]
+        self.g22 = data[7]
+        self.sigma[0] = data[8]
+        self.sigma[1] = data[9]
+        self.k1 = data[10]
+        self.k2 = data[11]
+        self.u_zero[0] = data[14]
+        self.u_zero[1] = data[15]
+        self.k = data[16]
+        self.T0 = data[17]
+        self.N = data[18]
+        self.T = data[19]
+        self.dt = data[20]
+        self.ji_1 = data[21]
+        self.ji_2 = data[22]
+
+        a1 = data[0]
+        b1 = data[1]
+        a2 = data[2]
+        b2 = data[3]
+        g11 = data[4]
+        g12 = data[5]
+        g21 = data[6]
+        g22 = data[7]
+        sigma = np.array([data[8], data[9]])
+        k1 = data[10]
+        k2 = data[11]
+        u0 = np.array([data[14], data[15]])
+        self.set_parameters_sto_plbrm(a1, b1, a2, b2, g11, g12, g21, g22, k1, k2, sigma, u0)
+        self.old_rg_state = np.load(file_name2)

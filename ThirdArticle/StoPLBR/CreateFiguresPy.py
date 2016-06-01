@@ -465,7 +465,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ussls = np.load('OneLongPathSolutionSto.npy')
     detuas = np.load('SolutionDetAs.npy')
 #    uas = np.loadtxt('SolutionStoAs.txt')
-    short = 16000 * 6
+    short = 8000*11
     t = ussls[0:short, 0]
     tas = ussls[-short:-1, 0]
     # Pots Vs Time
@@ -593,6 +593,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
 # Format 120 mm
 # ---------------------------------------------------------------------
     plt.close()
+    elevation_angle=10
     w = 1.0
     fig_width_mm = 120 * w                       # 120 mm
     inches_per_mm = 1.0 / 25.4                   # Convert mm to inch
@@ -628,8 +629,8 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
          urk[0:short, 2].max(),
          detuas[0:short, 2].max()]
     )
-    ax3.set_zlim([-200, yzmax])
-    ax3.view_init(elev=20., azim=-143)
+    ax3.set_zlim([-100, yzmax])
+    ax3.view_init(elev=elevation_angle, azim=-143)
     #
     ax3.plot(urk[0:short, 1], t, urk[0:short, 2],
              color=det_color,
@@ -639,18 +640,19 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
              )
     ax3.plot(ussls[0:short, 1], t, ussls[0:short, 2],
              color=sto_color,
-             lw=1,
+             lw=0.5,
              linestyle='-',
              # marker='.',
              ms=1,
              mfc='none',
              label='Sto. Short Time'
              )
-    ax3.zaxis._axinfo['label']['space_factor'] = 1.75
-    ax3.yaxis._axinfo['label']['space_factor'] = 2.5
-    ax3.xaxis._axinfo['label']['space_factor'] = 2.75
+    ax3.zaxis._axinfo['label']['space_factor'] = .01
+    ax3.yaxis._axinfo['label']['space_factor'] = .01
+    ax3.xaxis._axinfo['label']['space_factor'] = .01
     #
-    ax3.yaxis.set_ticks(np.arange(t[0], t[-1], 1500))
+    ax3.yaxis.set_ticks(np.arange(t[0], t[-1], 500))
+    ax3.xaxis.set_ticks(np.arange(0, 15, 3))
     ax3.set_ylabel(r'$t$ (days)')
     axbox = ax3.get_position()
     x_value = .19  # Offset by eye
@@ -680,24 +682,26 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
              ms=1,
              label="Sto. Long Time"
              )
-    ax4.yaxis.set_ticks(np.arange(tas[0], tas[-1], 1500))
-    ax4.zaxis._axinfo['label']['space_factor'] = 1.75
-    ax4.yaxis._axinfo['label']['space_factor'] = 2.75
-    ax4.xaxis._axinfo['label']['space_factor'] = 2.75
+    ax4.yaxis.set_ticks(np.arange(tas[0], tas[-1], 1000))
+    ax4.xaxis.set_ticks(np.arange(0, 15, 3))
+    ax4.zaxis._axinfo['label']['space_factor'] = .01
+    ax4.yaxis._axinfo['label']['space_factor'] = .01
+    ax4.xaxis._axinfo['label']['space_factor'] = .01
     ax4.set_xlabel(r'$OC(u)$')
     ax4.set_ylabel(r'$t$ (days)')
-    ax4.zaxis.set_rotate_label(False)
+    ax4.zaxis.set_rotate_label(True)
     ax4.set_zlabel(r'$OB(v)$', rotation=90)
     ax4.zaxis.set_rotate_label(False)
-    ax4.set_zlim([-200, yzmax])
+    ax4.set_zlim([-100, yzmax])
     ax4.set_ylim([tas[0] - 200, tas[-1] + 200])
-    ax4.view_init(elev=20., azim=-145)
+    ax4.view_init(elev=elevation_angle, azim=-145)
     axbox = ax4.get_position()
     x_value = -.2  # Offset by eye
     y_value = .7
     ax4.legend(loc=(axbox.x0 + x_value, axbox.y0 + y_value),
                numpoints=1)
-    plt.savefig(file_name3, bbox_inches='tight')
+    #plt.tight_layout()
+    plt.savefig(file_name3)
 
 
 def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
@@ -753,7 +757,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
 # ---------------------------------------------------------------
     fig2, (ax3, ax4) = plt.subplots(nrows=2)
     tm1 = 300000
-    tm2 = 500000
+    tm2 = 507000
     tml1 = t[tm1]
     tml2 = t[tm2]
     ax3 = plt.subplot(211)
@@ -773,6 +777,13 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
              label='Sto. OC'
              )
     ax3.grid(False)
+    ax3.legend(
+        bbox_to_anchor=(0., 1.0, 1., .5),
+        loc=3,
+        ncol=2,
+        mode="expand",
+        borderaxespad=0.0
+    )
     #
     #
     #
@@ -802,7 +813,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     ax5 = plt.subplot(211)
     ax5.set_xlabel(r'$t$ (days)')
     ax5.set_ylabel(r'$OC(u)$')
-    ax5.set_xlim([-200, 650 * 50])
+    ax5.set_xlim([-200, 650 * 48])
     ax5.plot(
         t, ussls[:, 1],
         color=sto_color,
@@ -832,6 +843,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     y1 = Ji2 - 1.1 * Ji2
     y2 = Ji2 + Ji2 * 1.1
     t1, t2 = 25000, 30000
+    #t1, t2 = 10000, 15000
     axins_a.set_xlim(t1, t2)
     axins_a.set_ylim(y1, y2)
     axins_a.plot(t, j2,
@@ -845,19 +857,19 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
                  linestyle='-'
                  )
 #
-    plt.xticks(visible=False)
+    plt.xticks([t1,t2], visible=True)
     mark_inset(
         ax5,
         axins_a,
-        loc1=3,
-        loc2=1,
+        loc1=1,
+        loc2=3,
         fc="none",
         ec="0.5"
     )
     ax6 = plt.subplot(212)
     ax6.set_xlabel(r'$t$ (days)')
     ax6.set_ylabel(r'$OB(v)$')
-    ax6.set_xlim([-200, 650 * 50])
+    ax6.set_xlim([-200, 650 * 48])
     ax6.plot(
         t, ussls[:, 2],
         color=sto_color,
@@ -897,8 +909,9 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
                  lw=1,
                  linestyle='-'
                  )
-    plt.xticks(visible=False)
-    mark_inset(ax6, axins_b, loc1=3, loc2=1, fc="none", ec="0.5")
+    plt.xticks([t1,t2], visible=True)
+
+    mark_inset(ax6, axins_b, loc1=1, loc2=3, fc="none", ec="0.5")
     ax6.grid(False)
     plt.tight_layout()
     plt.savefig(file_name2)
@@ -910,116 +923,6 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
 # =====================================================================
 #
 # =====================================================================
-    fig4, ax7 = plt.subplots()
-    ax7.set_xlabel(r'$t$ (days)')
-    ax7.set_ylabel(r'$OC(u)$')
-    ax7.set_xlim([-200, 650 * 50])
-    ax7.plot(
-        t, ussls[:, 1],
-        color=sto_color,
-        lw=.5,
-        linestyle='-',
-        label='Sto. OCs'
-    )
-    ax7.plot(t, j2,
-             color=ji_color,
-             lw=2,
-             linestyle='-',
-             label=r'$\xi_2$'
-             )
-    ax7.legend(
-        bbox_to_anchor=(0., 1.0, 1., .5),
-        loc=3,
-        ncol=2,
-        mode="expand",
-        borderaxespad=0.0
-    )
-    axins = inset_axes(ax7, 1, .5,
-                       loc=2,
-                       bbox_to_anchor=(0.35, 0.55),
-                       bbox_transform=ax4.figure.transFigure
-                       )
-    y1 = Ji2 - 1.1 * Ji2
-    y2 = Ji2 + Ji2 * 1.1
-    t1, t2 = 25000, 30000
-    axins.set_xlim(t1, t2)
-    axins.set_ylim(y1, y2)
-    axins.plot(t, j2,
-               color=ji_color,
-               lw=2,
-               linestyle='-'
-               )
-    axins.plot(t, ussls[:, 1],
-               color=sto_color,
-               lw=1,
-               linestyle='-'
-               )
-    plt.xticks(visible=False)
-    mark_inset(
-        ax7,
-        axins,
-        loc1=3,
-        loc2=1,
-        # fc="none",
-        ec="0.5"
-    )
-    plt.tight_layout()
-    plt.savefig("LongPath(OCs).eps")
-# ==============================================================
-    fig5, ax8 = plt.subplots()
-    ax8.set_xlabel(r'$t$ (days)')
-    ax8.set_ylabel(r'$OB(v)$')
-    ax8.set_xlim([-200, 650 * 50])
-    ax8.plot(t, j1,
-             color=ji_color,
-             lw=2,
-             linestyle='-',
-             label=r'$\xi_1$'
-             )
-    ax8.plot(
-        t, ussls[:, 2],
-        color=color1,
-        lw=.5,
-        linestyle='-',
-        label='Sto. OBs'
-    )
-    ax8.legend(
-        bbox_to_anchor=(0., 1.0, 1., .5),
-        loc=3,
-        ncol=2,
-        mode="expand",
-        borderaxespad=0.0
-    )
-    axins = inset_axes(
-        ax8, 1, .5,
-        loc=2,
-        bbox_to_anchor=(0.35, .55),
-        bbox_transform=ax6.figure.transFigure
-    )
-    # axins = zoomed_inset_axes(ax5, 2.5, loc=2)
-    t1, t2, y1, y2 = 25000, 30000, (Ji1 - 1.1 * Ji1), (Ji1 + 1.1 * Ji1)
-    axins.set_xlim(t1, t2)
-    axins.set_ylim(y1, y2)
-    axins.plot(t, j1,
-               color=ji_color,
-               lw=2,
-               linestyle='-'
-               )
-    axins.plot(t, ussls[:, 2],
-               color=sto_color,
-               lw=1,
-               linestyle='-'
-               )
-    plt.xticks(visible=False)
-    mark_inset(ax8, axins, loc1=3, loc2=1, fc="none", ec="0.5")
-    ax7.legend(loc='upper center',
-               bbox_to_anchor=(0.5, 1.05),
-               ncol=3,
-               fancybox=True,
-               shadow=True)
-    plt.tight_layout()
-    plt.savefig("LongPath(OBs).eps")
-#    ================================================================
 
 
 def fig_bone_mass(file_name='BoneMass.eps'):
@@ -1278,13 +1181,14 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
 
 #     Model parameters
 # ---------------------------------------------------
-a1 = 0.3        # Model parameters  ai = \alpha_i
-a2 = 0.18
+a1 = 0.15
+a2 = 0.16
 b1 = 0.2
 b2 = 0.02
 ns = 0.1        # Noise intensity
-gamma1 = -0.8
-gamma2 = 0.5
+gamma1 = -0.837
+gamma2 = 0.88
+
 sigma = np.array([ns * b1, ns * b2])
 k1 = 0.03
 k2 = 0.0017
@@ -1303,7 +1207,7 @@ LTM = 5
 #
 StoPlbrmJC = StoPLBRM()
 StoPlbrmJC.initialize_mesh(k, p, r, T0, T)
-StoPlbrmJC.noise_update(123456789)
+StoPlbrmJC.noise_update()
 StoPlbrmJC.set_parameters_sto_plbrm(a1, b1, a2, b2, 1.0,
                                     gamma2, gamma1, 1.0, k1, k2, sigma, U0)
 # color_pallet
@@ -1328,10 +1232,8 @@ params = {
 rcParams.update(params)
 
 #
-fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps",
-              file_name3="Fig4.eps")
-# fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",
-#                     file_name3="Fig5.eps")
+#fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps", file_name3="Fig4.eps")
+fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",file_name3="Fig5.eps")
 # fig_bone_mass(file_name='Fig6.eps')
 # fig_short_time_moments(file_name="Fig7.eps")
 # fig_long_time_moments(file_name="Fig8.eps")
