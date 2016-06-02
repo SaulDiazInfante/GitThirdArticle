@@ -6,11 +6,11 @@ from StoPLBRJerezChen import StoPLBRM
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # Stencil Parameters
-k = 18
+k = 20
 p = 0
 r = p
 T0 = 0.0
-T = 650 * 4  # almost 48 periods
+T =  2**11# 650 * 4  # almost 48 periods
 
 
 StoPlbrmJC = StoPLBRM()
@@ -34,16 +34,14 @@ else:
 
 t = StoPlbrmJC.t_k
 
-ussls_det = StoPlbrmJC.ssls_det()
-np.save("OneLongPathSolutionDet.npy", np.transpose(np.array([t, StoPlbrmJC.u_ssls_det[:, 0],
-                                                             StoPlbrmJC.u_ssls_det[:, 1]])))
+u_det = StoPlbrmJC.rk()
+np.save("OneLongPathSolutionDet.npy", np.transpose(np.array([t, u_det[:, 0], u_det[:, 1]])))
 StoPlbrmJC.noise_update()
-#ussls = StoPlbrmJC.ssls()
+# ussls = StoPlbrmJC.ssls()
 np.save("OneLongPathSolutionSto.npy", np.transpose(np.array([t, StoPlbrmJC.u_ssls[:, 0],
                                                              StoPlbrmJC.u_ssls[:, 1]])))
 ones = np.ones(t.shape[0])
 z = StoPlbrmJC.bone_mass()
-#np.save('BoneMass.npy', np.transpose(np.array([t[0:-1:100], StoPlbrmJC.z[0:-1:100]])))
-
-plt.plot(t,z)
+# np.save('BoneMass.npy', np.transpose(np.array([t[0:-1:100], StoPlbrmJC.z[0:-1:100]])))
+plt.plot(t, z)
 plt.show()

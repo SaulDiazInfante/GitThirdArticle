@@ -52,7 +52,8 @@ class StoPLBRM(PLBRMJerezChen):
         # steady states
         self.gamma = g12 * g21 - (1.0 - g11) * (1.0 - g22)
         #
-        self.u_bar = np.array([0.0, 0.0])
+        self.u_bar = np.array([np.exp(1/self.g12 * np.log(self.b2/self.a2)),
+                               np.exp(1/self.g21 * np.log(self.b1/self.a1))])
         self.u_zero = np.array([u_0, v_0])
         self.ji_1 = ((b1 + 0.5 * (sigma_1 ** 2)) / a1) ** (1.0 / g21)
         self.ji_2 = ((b2 + 0.5 * (sigma_2 ** 2)) / a2) ** (1.0 / g12)
@@ -211,11 +212,11 @@ class StoPLBRM(PLBRMJerezChen):
             self.u_rk[0] = uzero
         for j in np.arange(l - 1):
             uj = self.u_rk[j].reshape([2, 1])
-            k1 = h * self.a(uj)
-            k2 = h * self.a(uj + 0.5 * k1)
-            k3 = h * self.a(uj + k2 / 2.0)
-            k4 = h * self.a(uj + k3)
-            increment = 1 / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+            k1 = self.a(uj)
+            k2 = self.a(uj + 0.5 * k1)
+            k3 = self.a(uj + k2 / 2.0)
+            k4 = self.a(uj + k3)
+            increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.u_rk[j + 1, :] = uj[:, 0] + increment[:, 0]
         urk = self.u_rk # self.u_rk[0:l:ss, :]
         return urk
@@ -267,7 +268,11 @@ class StoPLBRM(PLBRMJerezChen):
         beta2 = self.b2
         gamma1 = self.g21
         gamma2 = self.g12
+        k1 = self.k1
+        k2 = self.k2
+        u_bar = self.u_bar
         self.u_ssls_det[0] = self.u_zero
+        self.z[0] = self.z_zero
         print '\n Deterministic Split Step Linear Steklov:'
         self.print_progress(0, l, 'Progress:',
                             'Complete',
@@ -280,6 +285,8 @@ class StoPLBRM(PLBRMJerezChen):
             uj2 = uj[1, 0] * np.exp(h * a12)
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             self.u_ssls_det[j + 1, :] = ustar[:, 0]
+            #u_bone =
+
             self.print_progress(j+1, l, 'Progress:',
                                 'Complete',
                                 bar_length=50, ratio=True)
@@ -358,8 +365,6 @@ class StoPLBRM(PLBRMJerezChen):
         h = self.Dt
         l = self.L
         r = self.R
-        k1 = self.k1
-        k2 = self.k2
         self.z[0] = self.z_zero
         self.z_sto[0] = self.z_zero
         '''
@@ -381,11 +386,12 @@ class StoPLBRM(PLBRMJerezChen):
                             bar_length=50, ratio=True)
 
         u_ssls_det = np.load(file_name1)
+        u_ssls_det = u_ssls_det[:, 1:3]
         for j in np.arange(l - 1):
             uj = u_ssls_det[j]
             k1 = self.f(uj)
             k2 = self.f(uj + 0.5 * k1)
-            k3 = self.f(uj + k2 / 2.0)
+            k3 = self.f(uj + 0.5 * k2 )
             k4 = self.f(uj + k3)
             increment = 1.0 / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.z[j + 1] = self.z[j] + h * increment
