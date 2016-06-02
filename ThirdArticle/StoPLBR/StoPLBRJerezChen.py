@@ -208,8 +208,13 @@ class StoPLBRM(PLBRMJerezChen):
         h = self.Dt
         l = self.L
         self.u_rk[0] = self.u_zero
+        self.z[0] = self.z_zero
         if np.int64(uzero[0]) != np.int64(1.0):
             self.u_rk[0] = uzero
+        print '\n fourth order Classic Runge Kutta:'
+        self.print_progress(0, l, 'Progress:',
+                            'Complete',
+                            bar_length=50, ratio=True)
         for j in np.arange(l - 1):
             uj = self.u_rk[j].reshape([2, 1])
             k1 = self.a(uj)
@@ -218,8 +223,18 @@ class StoPLBRM(PLBRMJerezChen):
             k4 = self.a(uj + k3)
             increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.u_rk[j + 1, :] = uj[:, 0] + increment[:, 0]
-        urk = self.u_rk # self.u_rk[0:l:ss, :]
-        return urk
+            uj = self.u_rk[j + 1, :]
+            k1 = self.f(uj)
+            k2 = self.f(uj + 0.5 * k1)
+            k3 = self.f(uj + k2 / 2.0)
+            k4 = self.f(uj + k3)
+            increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+            self.z[j + 1] = self.z[j] + increment
+            self.print_progress(j + 1, l, 'Progress:',
+                                'Complete',
+                                bar_length=50, ratio=True)
+        urk, z = self.u_rk, self.z
+        return urk, z
 
 
     #
@@ -270,14 +285,17 @@ class StoPLBRM(PLBRMJerezChen):
         gamma2 = self.g12
         k1 = self.k1
         k2 = self.k2
-        u_bar = self.u_bar
+        u_bar = self.u_bar[0]
+        v_bar = self.u_bar[1]
         self.u_ssls_det[0] = self.u_zero
         self.z[0] = self.z_zero
         print '\n Deterministic Split Step Linear Steklov:'
         self.print_progress(0, l, 'Progress:',
                             'Complete',
                             bar_length=50, ratio=True)
+
         for j in np.arange(l - 1):
+            indicator_u, indicator_v = 1.0, 1.0
             uj = self.u_ssls_det[j, :].reshape([2, 1])
             a11 = alpha1 * np.exp(gamma1 * np.log(uj[1, 0])) - beta1
             uj1 = uj[0, 0] * np.exp(h * a11)
@@ -285,16 +303,21 @@ class StoPLBRM(PLBRMJerezChen):
             uj2 = uj[1, 0] * np.exp(h * a12)
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             self.u_ssls_det[j + 1, :] = ustar[:, 0]
-            #u_bone =
-
+            if np.sign(uj[0, 0] - u_bar) < 0:
+                indicator_u = 0.0
+            if np.sign(uj[1, 0] - v_bar) < 0:
+                indicator_v = 0.0
+            u_bone = u_bar * (1.0 - np.exp(-k1 * h)) + uj[0, 0] * np.exp(-k1 * h)
+            v_bone = v_bar * (1.0 - np.exp(k2 * h)) + uj[1, 0] * np.exp(k2 * h)
+            self.z[j+1] = u_bone * indicator_u + v_bone * indicator_v
             self.print_progress(j+1, l, 'Progress:',
                                 'Complete',
                                 bar_length=50, ratio=True)
         np.save(self.det_sol_file_name,
                 np.transpose(
                         np.array([self.t_k, self.u_ssls_det[:, 0], self.u_ssls_det[:, 1]])))
-        u_ssls = self.u_ssls_det
-        return u_ssls
+        u_ssls, z = self.u_ssls_det, self.z
+        return u_ssls, z
     #
 
     def long_time_behavior(self, seed, k_times=1):
@@ -353,8 +376,8 @@ class StoPLBRM(PLBRMJerezChen):
         z = - k1 * np.sqrt(np.abs(u - ji_2)) \
             + k2 * np.sqrt(np.abs(v - ji_1))
         """
-        z = - k1 * np.max([0.0, u - u0]) \
-            + k2 * np.max([0.0, v - v0])
+        z = - k1 * np.max([u - u0, 0]) \
+            + k2 * np.max([v - v0, 0])
         """
         z = - k1 * np.sqrt(np.max([0.0, u - ji_2])) \
             + k2 * np.sqrt(np.max([0.0, v - ji_1]))
