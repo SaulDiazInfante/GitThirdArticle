@@ -6,8 +6,8 @@ import sys as Sys
 
 class StoPLBRM(PLBRMJerezChen):
     def __init__(self, k=20, p=0, r=0, t_0=0, t_f=36250, flag=1,
-                 a1=0.3, b1=0.2, a2=0.18, b2=0.02, g11=1.0, g12=0.5,
-                 g21=-0.9, g22=1.0, k1=0.022914, k2=0.0000038,
+                 a1=0.15, b1=0.2, a2=0.16, b2=0.02, g11=1.0, g12=0.88,
+                 g21=-0.837, g22=1.0, k1=0.2073, k2=0.000183, z_zero=96.0,
                  sigma_1=0.02, sigma_2=0.002, u_0=10.0, v_0=0.7, seed=114793524):
 
         self.k = k
@@ -22,13 +22,13 @@ class StoPLBRM(PLBRMJerezChen):
         self.R = np.int64(2 ** r)
         self.T = t_f
         self.dt = self.T / np.float(self.N)
-        self.IndexN = np.arange(self.N, dtype=np.uint64)
+        self.IndexN = np.arange(np.int(self.N), dtype=np.uint64)
         # set of index to Ito integral --------------------------------
         self.tau = self.IndexN[0:self.N:self.P]
-        self.t = np.linspace(0, self.T, self.N , dtype=np.float32)
+        self.t = np.linspace(0, self.T, np.int(self.N), dtype=np.float32)
         self.t_k = self.t[self.tau]
         self.Dt = np.float(self.R) * self.dt
-        self.L = np.int64(np.float64(self.N) /np.float64(self.R))
+        self.L = np.int64(np.float64(self.N) / np.float64(self.R))
         #  random_generator
         self.seed = seed
         np.random.seed(seed)
@@ -47,6 +47,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.g22 = g22
         self.k1 = k1
         self.k2 = k2
+        self.z_zero=z_zero
         self.sigma = np.array([sigma_1, sigma_2])
         # steady states
         self.gamma = g12 * g21 - (1.0 - g11) * (1.0 - g22)
@@ -285,7 +286,7 @@ class StoPLBRM(PLBRMJerezChen):
         np.save(self.det_sol_file_name,
                 np.transpose(
                         np.array([self.t_k, self.u_ssls_det[:, 0], self.u_ssls_det[:, 1]])))
-        u_ssls = self.u_ssls
+        u_ssls = self.u_ssls_det
         return u_ssls
     #
 
@@ -353,14 +354,14 @@ class StoPLBRM(PLBRMJerezChen):
         """
         return z
 
-    def bone_mass(self, k1_sto=0.00004):
+    def bone_mass(self, k1_sto=0.00004, file_name1='OneLongPathSolutionDet.npy'):
         h = self.Dt
         l = self.L
         r = self.R
         k1 = self.k1
         k2 = self.k2
-        self.z[0] = .96
-        self.z_sto[0] = .96
+        self.z[0] = self.z_zero
+        self.z_sto[0] = self.z_zero
         '''
         integrator = ode(self.f)
         integrator.set_integrator('dopri5')
@@ -378,20 +379,22 @@ class StoPLBRM(PLBRMJerezChen):
         print '\nCalculating Bone Mass with Runge Kutta 4 - order'
         self.print_progress(0, l, 'Progress:','Complete',
                             bar_length=50, ratio=True)
+
+        u_ssls_det = np.load(file_name1)
         for j in np.arange(l - 1):
-            uj = self.u_ssls_det[j]
+            uj = u_ssls_det[j]
             k1 = self.f(uj)
             k2 = self.f(uj + 0.5 * k1)
             k3 = self.f(uj + k2 / 2.0)
             k4 = self.f(uj + k3)
             increment = 1.0 / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.z[j + 1] = self.z[j] + h * increment
-            self.print_progress(j + 1, l, 'Bone mass:','Complete',
-                                 bar_length=50, ratio=True)
-        np.save(self.bone_mass_file_name,
-                np.transpose(
-                        np.array([self.t_k, self.z])))
-            # self.z_sto[j + 1] = self.z_sto[j] + h * z_sto
+            self.print_progress(j + 1, l, 'Bone mass:', 'Complete', bar_length=50, ratio=True)
+        print '\n'
+        np.save(self.bone_mass_file_name,np.transpose(np.array([self.t_k, self.z])))
+        # self.z_sto[j + 1] = self.z_sto[j] + h * z_sto
+        z =self.z
+        return z
 
     #
     def save_data(self):

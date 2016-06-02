@@ -640,7 +640,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
              )
     ax3.plot(ussls[0:short, 1], t, ussls[0:short, 2],
              color=sto_color,
-             lw=0.5,
+             lw=1,
              linestyle='-',
              # marker='.',
              ms=1,
@@ -651,7 +651,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax3.yaxis._axinfo['label']['space_factor'] = .01
     ax3.xaxis._axinfo['label']['space_factor'] = .01
     #
-    ax3.yaxis.set_ticks(np.arange(t[0], t[-1], 500))
+    ax3.yaxis.set_ticks(np.arange(t[0], t[-1], 1250))
     ax3.xaxis.set_ticks(np.arange(0, 15, 3))
     ax3.set_ylabel(r'$t$ (days)')
     axbox = ax3.get_position()
@@ -682,7 +682,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
              ms=1,
              label="Sto. Long Time"
              )
-    ax4.yaxis.set_ticks(np.arange(tas[0], tas[-1], 1000))
+    ax4.yaxis.set_ticks(np.arange(tas[0], tas[-1], 1250))
     ax4.xaxis.set_ticks(np.arange(0, 15, 3))
     ax4.zaxis._axinfo['label']['space_factor'] = .01
     ax4.yaxis._axinfo['label']['space_factor'] = .01
