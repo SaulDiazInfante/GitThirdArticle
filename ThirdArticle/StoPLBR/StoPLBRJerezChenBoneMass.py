@@ -6,14 +6,14 @@ from StoPLBRJerezChen import StoPLBRM
 # ----------------------------------------------------------------------
 # ----------------------------------------------------------------------
 # Stencil Parameters
-k = 20
+k = 6
 p = 0
 r = p
 T0 = 0.0
-T =  2**11# 650 * 4  # almost 48 periods
+T = 31200  # 650 * 48  # almost 48 periods
 
 
-StoPlbrmJC = StoPLBRM()
+StoPlbrmJC = StoPLBRM(k=5, p=0, r=0, t_0=0, t_f=T)
 # StoPlbrmJC.load_parameters()
 StoPlbrmJC.initialize_mesh(k, p, r, T0, T)
 #StoPlbrmJC.noise_update()

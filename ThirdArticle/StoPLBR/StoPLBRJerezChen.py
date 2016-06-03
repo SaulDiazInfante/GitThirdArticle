@@ -4,8 +4,9 @@ from scipy.integrate import ode
 from DeterministicModelJerezChen import PLBRMJerezChen
 import sys as Sys
 
+
 class StoPLBRM(PLBRMJerezChen):
-    def __init__(self, k=20, p=0, r=0, t_0=0, t_f=36250, flag=1,
+    def __init__(self, k=5, p=0, r=0, t_0=0, t_f=3120, flag=1,
                  a1=0.15, b1=0.2, a2=0.16, b2=0.02, g11=1.0, g12=0.88,
                  g21=-0.837, g22=1.0, k1=0.2073, k2=0.000183, z_zero=96.0,
                  sigma_1=0.02, sigma_2=0.002, u_0=10.0, v_0=0.7, seed=114793524):
@@ -14,12 +15,12 @@ class StoPLBRM(PLBRMJerezChen):
         self.p = p
         self.r = r
         self.T0 = t_0
-        # self.N = np.int64(10 ** k)
-        # self.P = np.int64(10 ** p)
-        # self.R = np.int64(10 ** r)
-        self.N = np.int64(2 ** k)
-        self.P = np.int64(2 ** p)
-        self.R = np.int64(2 ** r)
+        self.N = np.int64(3.12 * 10 ** k)
+        self.P = np.int64(10 ** p)
+        self.R = np.int64(10 ** r)
+        # self.N = np.int64(2 ** k)
+        # self.P = np.int64(2 ** p)
+        # self.R = np.int64(2 ** r)
         self.T = t_f
         self.dt = self.T / np.float(self.N)
         self.IndexN = np.arange(np.int(self.N), dtype=np.uint64)
@@ -47,13 +48,13 @@ class StoPLBRM(PLBRMJerezChen):
         self.g22 = g22
         self.k1 = k1
         self.k2 = k2
-        self.z_zero=z_zero
+        self.z_zero = z_zero
         self.sigma = np.array([sigma_1, sigma_2])
         # steady states
         self.gamma = g12 * g21 - (1.0 - g11) * (1.0 - g22)
         #
-        self.u_bar = np.array([np.exp(1/self.g12 * np.log(self.b2/self.a2)),
-                               np.exp(1/self.g21 * np.log(self.b1/self.a1))])
+        self.u_bar = np.array([np.exp((1.0 / self.g12) * np.log(self.b2/self.a2)),
+                               np.exp((1.0 / self.g21) * np.log(self.b1/self.a1))], dtype=np.float64)
         self.u_zero = np.array([u_0, v_0])
         self.ji_1 = ((b1 + 0.5 * (sigma_1 ** 2)) / a1) ** (1.0 / g21)
         self.ji_2 = ((b2 + 0.5 * (sigma_2 ** 2)) / a2) ** (1.0 / g12)
@@ -110,12 +111,12 @@ class StoPLBRM(PLBRMJerezChen):
         self.p = p
         self.r = r
         self.T0 = t_0
-        # self.N = np.int64(10 ** k)
-        # self.P = np.int64(10 ** p)
-        # self.R = np.int64(10 ** r)
-        self.N = np.int64(2 ** k)
-        self.P = np.int64(2 ** p)
-        self.R = np.int64(2 ** r)
+        self.N = np.int64(3.12 * 10 ** k)
+        self.P = np.int64(10 ** p)
+        self.R = np.int64(10 ** r)
+        # self.N = np.int64(2 ** k)
+        # self.P = np.int64(2 ** p)
+        # self.R = np.int64(2 ** r)
         self.T = t_f
         self.dt = self.T / np.float(self.N)
         self.IndexN = np.arange(self.N, dtype=np.uint64)
@@ -138,6 +139,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.z_sto = np.zeros(self.L)
         self.k_t = 0
     #
+
     def noise_update(self, flag=True):
         self.dWj = np.random.randn(2, np.int(self.N))
         self.dWj = np.sqrt(self.dt) * self.dWj
@@ -218,16 +220,16 @@ class StoPLBRM(PLBRMJerezChen):
         for j in np.arange(l - 1):
             uj = self.u_rk[j].reshape([2, 1])
             k1 = self.a(uj)
-            k2 = self.a(uj + 0.5 * k1)
-            k3 = self.a(uj + k2 / 2.0)
-            k4 = self.a(uj + k3)
+            k2 = self.a(uj + 0.5 * h * k1)
+            k3 = self.a(uj + 0.5 * h * k2 )
+            k4 = self.a(uj + h * k3)
             increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.u_rk[j + 1, :] = uj[:, 0] + increment[:, 0]
-            uj = self.u_rk[j + 1, :]
+            # bone mass
             k1 = self.f(uj)
-            k2 = self.f(uj + 0.5 * k1)
-            k3 = self.f(uj + k2 / 2.0)
-            k4 = self.f(uj + k3)
+            k2 = self.f(uj + 0.5 * h * k1)
+            k3 = self.f(uj + 0.5 * h * k2)
+            k4 = self.f(uj + h * k3)
             increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.z[j + 1] = self.z[j] + increment
             self.print_progress(j + 1, l, 'Progress:',
@@ -303,6 +305,7 @@ class StoPLBRM(PLBRMJerezChen):
             uj2 = uj[1, 0] * np.exp(h * a12)
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             self.u_ssls_det[j + 1, :] = ustar[:, 0]
+            '''
             if np.sign(uj[0, 0] - u_bar) < 0:
                 indicator_u = 0.0
             if np.sign(uj[1, 0] - v_bar) < 0:
@@ -310,7 +313,14 @@ class StoPLBRM(PLBRMJerezChen):
             u_bone = u_bar * (1.0 - np.exp(-k1 * h)) + uj[0, 0] * np.exp(-k1 * h)
             v_bone = v_bar * (1.0 - np.exp(k2 * h)) + uj[1, 0] * np.exp(k2 * h)
             self.z[j+1] = u_bone * indicator_u + v_bone * indicator_v
-            self.print_progress(j+1, l, 'Progress:',
+            '''
+            k1 = self.f(uj)
+            k2 = self.f(uj + 0.5 * h * k1)
+            k3 = self.f(uj + 0.5 * h * k2)
+            k4 = self.f(uj + h * k3)
+            increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
+            self.z[j + 1] = self.z[j] + increment
+            self.print_progress(j + 1, l, 'Progress:',
                                 'Complete',
                                 bar_length=50, ratio=True)
         np.save(self.det_sol_file_name,
@@ -346,7 +356,7 @@ class StoPLBRM(PLBRMJerezChen):
         v0 = self.u_bar[1]
         k = self.k_t
         t_k = self.t_k[k]
-        while  t_k < t:
+        while t_k < t:
             k += 1
             t_k = self.t_k[k]
         u = self.u_rk[k, 0]
@@ -370,14 +380,14 @@ class StoPLBRM(PLBRMJerezChen):
         ji_2 = self.ji_2  # / self.u_max[0]
         u0 = self.u_bar[0]
         v0 = self.u_bar[1]
-        u = x[0]
-        v = x[1]
+        u = np.float64(x[0])
+        v = np.float64(x[1])
         """
         z = - k1 * np.sqrt(np.abs(u - ji_2)) \
             + k2 * np.sqrt(np.abs(v - ji_1))
         """
-        z = - k1 * np.max([u - u0, 0]) \
-            + k2 * np.max([v - v0, 0])
+        z = - k1 * np.max(np.array([-u0 + u, 0.0], dtype=np.float64))\
+            + k2 * np.max(np.array([-v0 + v, 0.0], dtype=np.float64))
         """
         z = - k1 * np.sqrt(np.max([0.0, u - ji_2])) \
             + k2 * np.sqrt(np.max([0.0, v - ji_1]))
@@ -420,9 +430,9 @@ class StoPLBRM(PLBRMJerezChen):
             self.z[j + 1] = self.z[j] + h * increment
             self.print_progress(j + 1, l, 'Bone mass:', 'Complete', bar_length=50, ratio=True)
         print '\n'
-        np.save(self.bone_mass_file_name,np.transpose(np.array([self.t_k, self.z])))
+        np.save(self.bone_mass_file_name, np.transpose(np.array([self.t_k, self.z])))
         # self.z_sto[j + 1] = self.z_sto[j] + h * z_sto
-        z =self.z
+        z = self.z
         return z
 
     #
@@ -482,11 +492,6 @@ class StoPLBRM(PLBRMJerezChen):
         np.save('SolutionSto.npy',
                 np.transpose(np.array([t[:, 0], sto_u1[:], sto_u2[:]]))
                 )
-        # np.savetxt('SolutionStoAs.txt',\
-        # np.transpose(np.array([tas[:,0], stoU1as[:] , stoU2as[:]])),\
-        # fmt=['%1.8f','%1.8f','%1.8f'],\
-        # delimiter='\t'\
-        # )
 
     def save_parameters(self, file_name1='parameters.txt', file_name2='rg_state.npy'):
         tag_par = np.array(['a1=', 'b1=', 'a2=', 'b2=', 'g11=', 'g12=', 'g21=', 'g22=', 'sigma1', 'sigma2', 'k1=',
