@@ -18,7 +18,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.p = p
         self.r = r
         self.T0 = t_0
-        self.N = np.int64(31.2 * 10 ** k)
+        self.N = np.int64(5.2 * 10 ** k)
         self.P = np.int64(10 ** p)
         self.R = np.int64(10 ** r)
         # self.N = np.int64(2 ** k)
@@ -120,7 +120,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.p = p
         self.r = r
         self.T0 = t_0
-        self.N = np.int64(31.2 * 10 ** k)
+        self.N = np.int64(5.2 * 10 ** k)
         self.P = np.int64(10 ** p)
         self.R = np.int64(10 ** r)
         # self.N = np.int64(2 ** k)
@@ -149,7 +149,8 @@ class StoPLBRM(PLBRMJerezChen):
         self.k_t = 0
     #
 
-    def noise_update(self, flag=True):
+    def noise_update(self, seed=114793524, flag=True):
+        np.random.seed(seed)
         self.dWj = np.random.randn(2, np.int(self.N))
         self.dWj = np.sqrt(self.dt) * self.dWj
         if flag:
@@ -280,6 +281,7 @@ class StoPLBRM(PLBRMJerezChen):
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             increment = ustar + fn * np.dot(self.b(ustar), self.w_inc)
             self.u_ssls[j + 1, :] = increment[:, 0]
+            '''
             uj = increment[:, 0]
             k1 = self.f_sto(uj)
             k2 = self.f_sto(uj + 0.5 * h * k1)
@@ -291,6 +293,7 @@ class StoPLBRM(PLBRMJerezChen):
                 print '\n\n\t\t bone mass outside of bounds'
                 bone_flag = False
                 break
+            '''
             self.print_progress(j + 1, l, 'Progress:', 'Complete',
                                 bar_length=50, ratio=True)
         print'\n'

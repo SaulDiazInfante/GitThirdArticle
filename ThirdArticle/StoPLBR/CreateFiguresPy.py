@@ -925,28 +925,13 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
 # =====================================================================
 
 
-def fig_bone_mass(file_name='BoneMass.eps'):
-    z = np.load('BoneMass.npy')
-    t = z[:, 0]
-    z_det = z[:, 1]
-    z_sto = z[:, 2]
-    fig_width_pt = 256    # 538.58*w	 \columnwidth(140mm)
-    inches_per_pt = 1.0 / 72.27    # Convert pt to inch
-    golden_mean = (np.sqrt(5) - 1.0) / 2.0    # Aesthetic ratio
-    fig_width = fig_width_pt * inches_per_pt    # width in inches
-    fig_height = fig_width * golden_mean    # height in inches
-    fig_size = [fig_width, fig_height]
-    params = {
-        'backend': 'ps',
-        'axes.labelsize': 10,
-        'text.fontsize': 10,
-        'legend.fontsize': 8,
-        'xtick.labelsize': 8,
-        'ytick.labelsize': 8,
-        'text.usetex': True,
-        'figure.figsize': fig_size
-    }
-    rcParams.update(params)
+def fig_bone_mass(file_name="BoneMass.eps"):
+    z_sto_data = np.load('bone_mass_sto.npy')
+    z_det_data = np.load('bone_mass_xppaut_graph.npy')
+    t = z_det_data[:, 0]
+    t_k = z_sto_data[:, 0]
+    z_det = z_det_data[:, 3]
+    z_sto = z_sto_data[:, 1]
     color1 = color_pallet[0]
 #    color2 = colorPallete[1]
     color3 = color_pallet[2]
@@ -955,32 +940,33 @@ def fig_bone_mass(file_name='BoneMass.eps'):
     sto_color = color3
     line_color = color4
     plt.close()
-    rcParams.update(params)
     plt.figure()
     plt.xlabel(r'$t$ (days)')
-    plt.ylabel(r'Bone mass (z)')
-    plt.xlim([0, 5000])
+    plt.ylabel(r'Bone mass \%')
+    plt.xlim([0, 650*48])
     plt.plot(t, 100 * np.ones(t.shape[0]),
              color=line_color,
              lw=.5,
              linestyle=':'
              )
-    plt.plot(t, 100 * z_det,
+    plt.plot(t, z_det,
              color=det_color,
              lw=1,
              linestyle='-',
              label='Deterministic'
              )
-    plt.plot(t, 100 * z_sto,
+
+    plt.plot(t_k, z_sto,
              color=sto_color,
              lw=1,
              linestyle='-',
              label='Stochastic'
              )
     plt.legend(loc=0)
-    plt.tight_layout()
-    plt.savefig(file_name)
-#object
+    # plt.tight_layout()
+    # plt.savefig(file_name)
+    plt.show()
+    plt.savefig('Fig6.eps', resolution=1000)
 
 
 def fig_short_time_moments(file_name="ShortPathMoments.eps"):
@@ -1232,8 +1218,10 @@ params = {
 rcParams.update(params)
 
 #
-#fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps", file_name3="Fig4.eps")
-fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",file_name3="Fig5.eps")
-# fig_bone_mass(file_name='Fig6.eps')
+# fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps",
+# file_name3="Fig4.eps")
+# fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",
+# file_name3="Fig5.eps")
+fig_bone_mass(file_name="Fig6.eps")
 # fig_short_time_moments(file_name="Fig7.eps")
 # fig_long_time_moments(file_name="Fig8.eps")
