@@ -46,8 +46,6 @@ else:
     print 'p1:=', bm.a1 * gamma2, \
           'p2:=', bm.a2 * np.abs(gamma1)
 
-
-
 # u_det, z = bm.ssls_det()
 # u_det, z = bm.rk()
 u_det = np.load("bone_mass_xppaut_graph.npy")
@@ -59,6 +57,7 @@ j = 1
 eps = 0.01
 k1 = bm.k1
 k2 = bm.k2
+'''
 while bone_condition and j < iter_max:
     bm.k1_sto = k1 + .25 * k1 * np.random.randn()
     bm.k2_sto = k2 + .25 * k2 * np.random.randn()
@@ -82,9 +81,17 @@ while bone_condition and j < iter_max:
         del ussls
         del z_sto
     j += 1
-
-# np.save("OneLongPathSolutionSto.npy", np.transpose(np.array([t,
-# bm.u_ssls[:, 0], bm.u_ssls[:, 1]])))
+'''
+ussls, z_sto = bm.ssls()
+plt.figure()
+plt.plot(bm.t_k, ussls[:, 0])
+plt.figure()
+plt.plot(bm.t_k, ussls[:, 1])
+plt.show()
+t = bm.t_k
+t = t.reshape([t.shape[0], 1])
+data = np.transpose([t[:,0], bm.u_ssls[:, 0], bm.u_ssls[:, 1]])
+np.save("OneLongPathSolutionSto.npy", data)
 # ones = np.ones(t.shape[0])
 # z = bm.bone_mass()
 # np.save('BoneMass.npy',

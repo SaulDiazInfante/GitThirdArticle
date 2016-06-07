@@ -463,9 +463,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
                         file_name3="PhasePotrait3d.eps"):
     urk = np.load('SolutionDet.npy')
     ussls = np.load('OneLongPathSolutionSto.npy')
-    detuas = np.load('SolutionDetAs.npy')
-#    uas = np.loadtxt('SolutionStoAs.txt')
-    short = 8000*11
+    short = 65000*4
     t = ussls[0:short, 0]
     tas = ussls[-short:-1, 0]
     # Pots Vs Time
@@ -499,8 +497,8 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax1 = fig1.add_subplot(111, projection='3d')
     ax1.frameon = False
     ax1.zaxis.set_rotate_label(False)
-    ax1.set_xlabel(r'$OC(u)$')
-    ax1.set_zlabel(r'$OB(v)$', rotation=90)
+    ax1.set_xlabel(r'Number of OC')
+    ax1.set_zlabel(r'Number of OB', rotation=90)
     #
     ax1.spines['top'].set_visible(False)
     ax1.spines['right'].set_visible(True)
@@ -508,8 +506,8 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax1.spines['left'].set_visible(True)
     yzmax = np.max(
         [ussls[0:short, 2].max(),
-         urk[0:short, 2].max(),
-         detuas[0:short, 2].max()]
+         urk[0:10 * short:10, 2].max(),
+         urk[-short*10:-1:10, 2].max()]
     )
     ax1.set_zlim([-200, yzmax])
     ax1.view_init(elev=20., azim=-143)
@@ -553,8 +551,8 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax2.spines['right'].set_visible(True)
     ax2.spines['bottom'].set_visible(True)
     ax2.spines['left'].set_visible(True)
-    ax2.plot(detuas[0:short, 1], ussls[-1 - short:-1, 0],
-             detuas[0:short, 2],
+    ax2.plot(urk[-1 - short:-1, 1], ussls[-1 - short:-1, 0],
+             urk[-1 - short:-1, 2],
              color=det_color,
              lw=1,
              linestyle='-',
@@ -574,10 +572,10 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax2.zaxis._axinfo['label']['space_factor'] = 1.75
     ax2.yaxis._axinfo['label']['space_factor'] = 2.75
     ax2.xaxis._axinfo['label']['space_factor'] = 2.75
-    ax2.set_xlabel(r'$OC(u)$')
+    ax2.set_xlabel(r'Number of OC')
     ax2.set_ylabel(r'$t$ (days)')
     ax2.zaxis.set_rotate_label(False)
-    ax2.set_zlabel(r'$OB(v)$', rotation=90)
+    ax2.set_zlabel(r'Number of OB', rotation=90)
     ax2.zaxis.set_rotate_label(False)
     ax2.set_zlim([-200, yzmax])
     ax2.set_ylim([tas[0] - 200, tas[-1] + 200])
@@ -617,8 +615,8 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax3 = fig3.add_subplot(1, 2, 1, projection='3d')
     ax3.frameon = False
     ax3.zaxis.set_rotate_label(False)
-    ax3.set_xlabel(r'$OC(u)$')
-    ax3.set_zlabel(r'$OB(v)$', rotation=90)
+    ax3.set_xlabel(r'Number of OC')
+    ax3.set_zlabel(r'Number of OB', rotation=90)
     #
     ax3.spines['top'].set_visible(False)
     ax3.spines['right'].set_visible(True)
@@ -627,7 +625,7 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     yzmax = np.max(
         [ussls[0:short, 2].max(),
          urk[0:short, 2].max(),
-         detuas[0:short, 2].max()]
+         urk[-short:-1, 2].max()]
     )
     ax3.set_zlim([-100, yzmax])
     ax3.view_init(elev=elevation_angle, azim=-143)
@@ -665,8 +663,8 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax4.spines['right'].set_visible(True)
     ax4.spines['bottom'].set_visible(True)
     ax4.spines['left'].set_visible(True)
-    ax4.plot(detuas[0:short, 1], ussls[-1 - short:-1, 0],
-             detuas[0:short, 2],
+    ax4.plot(urk[0:short, 1], urk[-1 - short:-1, 0],
+             urk[0:short, 2],
              color=det_color,
              lw=1,
              linestyle='-',
@@ -687,10 +685,10 @@ def fig_phase_potrait3d(file_name1="PhasePotrait3d(a).eps",
     ax4.zaxis._axinfo['label']['space_factor'] = .01
     ax4.yaxis._axinfo['label']['space_factor'] = .01
     ax4.xaxis._axinfo['label']['space_factor'] = .01
-    ax4.set_xlabel(r'$OC(u)$')
+    ax4.set_xlabel(r'Number of OC')
     ax4.set_ylabel(r'$t$ (days)')
     ax4.zaxis.set_rotate_label(True)
-    ax4.set_zlabel(r'$OB(v)$', rotation=90)
+    ax4.set_zlabel(r'Number of OB', rotation=90)
     ax4.zaxis.set_rotate_label(False)
     ax4.set_zlim([-100, yzmax])
     ax4.set_ylim([tas[0] - 200, tas[-1] + 200])
@@ -729,7 +727,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
 #
     ax1 = plt.subplot(211)
     # ax1.set_xlabel(r'$t$ (days)')
-    ax1.set_ylabel(r'$OC(u)$')
+    ax1.set_ylabel(r'Number of OC')
     ax1.set_xlim([-200, 650 * 48])
     ax1.plot(t, ussls[:, 1],
              color=sto_color,
@@ -740,7 +738,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     ax1.grid(False)
     ax2 = plt.subplot(212)
     ax2.set_xlabel(r'$t$ (days)')
-    ax2.set_ylabel(r'$OB(v)$')
+    ax2.set_ylabel(r'Number of OB')
     ax2.set_xlim([-200, 650 * 48])
     ax2.plot(t, ussls[:, 2],
              color=sto_color,
@@ -762,7 +760,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     tml2 = t[tm2]
     ax3 = plt.subplot(211)
     # ax3.set_xlabel(r'$t$ (days)')
-    ax3.set_ylabel(r'$OC(u)$')
+    ax3.set_ylabel(r'Number of OC')
     ax3.set_xlim([tml1, tml2])
     ax3.plot(t[tm1:tm2], urk[tm1:tm2, 1],
              color=det_color,
@@ -789,7 +787,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     #
     ax4 = plt.subplot(212)
     ax4.set_xlabel(r'$t$ (days)')
-    ax4.set_ylabel(r'$OB(v)$')
+    ax4.set_ylabel(r'Number of OB')
     ax4.set_xlim([tml1, tml2])
     ax4.plot(t[tm1:tm2], urk[tm1:tm2, 2],
              color=det_color,
@@ -812,7 +810,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     fig3, (ax5, ax6) = plt.subplots(nrows=2)
     ax5 = plt.subplot(211)
     ax5.set_xlabel(r'$t$ (days)')
-    ax5.set_ylabel(r'$OC(u)$')
+    ax5.set_ylabel(r'Number of OC')
     ax5.set_xlim([-200, 650 * 48])
     ax5.plot(
         t, ussls[:, 1],
@@ -868,7 +866,7 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
     )
     ax6 = plt.subplot(212)
     ax6.set_xlabel(r'$t$ (days)')
-    ax6.set_ylabel(r'$OB(v)$')
+    ax6.set_ylabel(r'Number of OB')
     ax6.set_xlim([-200, 650 * 48])
     ax6.plot(
         t, ussls[:, 2],
@@ -925,13 +923,16 @@ def fig_long_path(file_name1='Fig2.eps', file_name2='Fig3.eps',
 # =====================================================================
 
 
-def fig_bone_mass(file_name="BoneMass.eps"):
+def fig_bone_mass(file_name1="Fig6.eps", file_name2="Fig7.eps"):
     z_sto_data = np.load('bone_mass_sto.npy')
     z_det_data = np.load('bone_mass_xppaut_graph.npy')
+    u_path_data = np.load('StoPathBoneMass.npy')
     t = z_det_data[:, 0]
     t_k = z_sto_data[:, 0]
     z_det = z_det_data[:, 3]
     z_sto = z_sto_data[:, 1]
+    u_path = np.array([u_path_data[1], u_path_data[2]])
+    u_path = u_path.transpose()
     color1 = color_pallet[0]
 #    color2 = colorPallete[1]
     color3 = color_pallet[2]
@@ -963,11 +964,58 @@ def fig_bone_mass(file_name="BoneMass.eps"):
              label='Stochastic'
              )
     plt.legend(loc=0)
-    # plt.tight_layout()
-    # plt.savefig(file_name)
-    plt.show()
-    plt.savefig('Fig6.eps', resolution=1000)
-
+    plt.tight_layout()
+    plt.savefig(file_name1, resolution=1000)
+    # Plot Bone mass with cells
+    plt.close()
+    fig1, (ax1, ax2, ax3) = plt.subplots(nrows=3)
+    ax1 = plt.subplot(311)
+    # ax1.set_xlabel(r'$t$ (days)')
+    ax1.set_ylabel(r'Number of OC')
+    ax1.set_xlim([-200, 650 * 48])
+    ax1.plot(t_k, u_path[:, 0],
+             color=sto_color,
+             lw=.5,
+             linestyle='-',
+             label='Stochastic'
+             )
+    ax1.grid(False)
+    plt.setp(ax1.get_xticklabels(), visible=False)
+    #
+    ax2 = plt.subplot(312)
+    # ax2.set_xlabel(r'$t$ (days)')
+    ax2.set_ylabel(r'Number of OB')
+    ax2.set_xlim([-200, 650 * 48])
+    ax2.plot(t_k, u_path[:, 1],
+             color=sto_color,
+             lw=.5,
+             linestyle='-',
+             label='Stochastic'
+             )
+    ax2.grid(False)
+    plt.setp(ax2.get_xticklabels(), visible=False)
+    #
+    ax3 = plt.subplot(313, sharex=ax1)
+    ax3.set_xlabel(r't(days)')
+    ax3.set_ylabel(r'Bone mass \%')
+    ax3.set_xlim([-200, 650 * 48])
+    ax3.plot(t, z_det,
+             color=det_color,
+             lw=.5,
+             linestyle='-',
+             label='Deterministic'
+             )
+    ax3.plot(t_k, z_sto,
+             color=sto_color,
+             lw=.5,
+             linestyle='-',
+             label='Stochastic'
+             )
+    ax3.grid(False)
+    ax3.legend(loc='upper center', bbox_to_anchor=(0.5, 1.2), ncol=2,
+               fancybox=False, shadow=False)
+    plt.tight_layout()
+    plt.savefig(file_name2)
 
 def fig_short_time_moments(file_name="ShortPathMoments.eps"):
     mean_short = np.load('MeanUShortTime.npy')
@@ -1005,7 +1053,7 @@ def fig_short_time_moments(file_name="ShortPathMoments.eps"):
     fig = plt.figure()
     ax1 = plt.subplot(221)
     ax1.set_xlabel(r'$t$ (days)')
-    ax1.set_ylabel(r'$OC(u)$')
+    ax1.set_ylabel(r'Number of OC')
     ax1.set_xlim([0, 5200])
     ax1.plot(t, u1_mean,
              color=mean_color,
@@ -1023,7 +1071,7 @@ def fig_short_time_moments(file_name="ShortPathMoments.eps"):
 #
     ax2 = plt.subplot(223)
     ax2.set_xlabel(r'$t$ (days)')
-    ax2.set_ylabel(r'$OB(v)$')
+    ax2.set_ylabel(r'Number of OB')
     ax2.set_xlim([0, 5200])
     ax2.plot(t, u2_mean,
              color=mean_color,
@@ -1038,11 +1086,12 @@ def fig_short_time_moments(file_name="ShortPathMoments.eps"):
              linestyle='-',
              label='MS-Short'
              )
+
     # ax2.legend(loc=0)
 #
     ax3 = plt.subplot(122)
-    ax3.set_xlabel(r'$OC(u)$')
-    ax3.set_ylabel(r'$OB(v)$')
+    ax3.set_xlabel(r'Number of OC')
+    ax3.set_ylabel(r'Number of OB')
     ax3.plot(u1_mean, u2_mean,
              color=mean_color,
              lw=1.0,
@@ -1103,7 +1152,7 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
     fig = plt.figure()
     ax1 = plt.subplot(221)
     ax1.set_xlabel(r'$t$ (days)')
-    ax1.set_ylabel(r'$OC(u)$')
+    ax1.set_ylabel(r'Number of OC')
     ax1.set_xlim([31200, 36400])
     ax1.plot(t, u1_mean,
              color=mean_color,
@@ -1121,7 +1170,7 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
 #
     ax2 = plt.subplot(223)
     ax2.set_xlabel(r'$t$ (days)')
-    ax2.set_ylabel(r'$OB(v)$')
+    ax2.set_ylabel(r'Number of OB')
     ax2.set_xlim([31200, 36400])
     ax2.plot(t, u2_mean,
              color=mean_color,
@@ -1138,8 +1187,8 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
     # ax2.legend(loc=0)
 #
     ax3 = plt.subplot(122)
-    ax3.set_xlabel(r'$OC(u)$')
-    ax3.set_ylabel(r'$OB(v)$')
+    ax3.set_xlabel(r'Number of OC')
+    ax3.set_ylabel(r'Number of OB')
     # ax3.set_xlim([-5,40])
     # ax3.set_ylim([-200, 12700])
     ax3.plot(u1_mean, u2_mean,
@@ -1159,9 +1208,10 @@ def fig_long_time_moments(file_name="LongPathMoments.eps"):
              )
     ax3.legend(loc=0)
     ax3.grid(True)
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, 1.315), ncol=2,
+               fancybox=False, shadow=False)
 #
-    fig.set_tight_layout(True)
-    # plt.tight_layout()
+    plt.tight_layout()
     plt.savefig(file_name, format='eps', dpi=1000)
 
 
@@ -1219,9 +1269,8 @@ rcParams.update(params)
 
 #
 # fig_long_path(file_name1="Fig2.eps", file_name2="Fig3.eps",
-# file_name3="Fig4.eps")
-# fig_phase_potrait3d(file_name1="Fig5a.eps", file_name2="Fig5b.eps",
-# file_name3="Fig5.eps")
-fig_bone_mass(file_name="Fig6.eps")
+#              file_name3="Fig4.eps")
+fig_phase_potrait3d()
+# fig_bone_mass()
 # fig_short_time_moments(file_name="Fig7.eps")
 # fig_long_time_moments(file_name="Fig8.eps")

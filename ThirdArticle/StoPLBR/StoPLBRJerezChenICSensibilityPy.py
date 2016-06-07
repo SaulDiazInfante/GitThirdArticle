@@ -168,6 +168,7 @@ mark_inset(
 )
 
 
-ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.315), ncol=4, fancybox=False, shadow=False)
+ax1.legend(loc='upper center', bbox_to_anchor=(0.5, 1.315), ncol=4,
+           fancybox=False, shadow=False)
 plt.tight_layout()
 plt.savefig(file_name1, resolution=1000)

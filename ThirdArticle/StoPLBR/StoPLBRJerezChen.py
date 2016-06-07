@@ -18,7 +18,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.p = p
         self.r = r
         self.T0 = t_0
-        self.N = np.int64(5.2 * 10 ** k)
+        self.N = np.int64(31.2 * 10 ** k)
         self.P = np.int64(10 ** p)
         self.R = np.int64(10 ** r)
         # self.N = np.int64(2 ** k)
@@ -60,9 +60,9 @@ class StoPLBRM(PLBRMJerezChen):
         self.gamma = g12 * g21 - (1.0 - g11) * (1.0 - g22)
         #
         self.u_bar = np.array([np.exp((1.0 / self.g12)
-                                      * np.log(self.b2/self.a2)),
+                                       * np.log(self.b2/self.a2)),
                                np.exp((1.0 / self.g21)
-                                      * np.log(self.b1/self.a1))],
+                                       * np.log(self.b1/self.a1))],
                               dtype=np.float64)
         self.u_zero = np.array([u_0, v_0])
         self.ji_1 = ((b1 + 0.5 * (sigma_1 ** 2)) / a1) ** (1.0 / g21)
@@ -120,7 +120,7 @@ class StoPLBRM(PLBRMJerezChen):
         self.p = p
         self.r = r
         self.T0 = t_0
-        self.N = np.int64(5.2 * 10 ** k)
+        self.N = np.int64(31.2 * 10 ** k)
         self.P = np.int64(10 ** p)
         self.R = np.int64(10 ** r)
         # self.N = np.int64(2 ** k)
@@ -281,7 +281,6 @@ class StoPLBRM(PLBRMJerezChen):
             ustar = np.array([uj1, uj2]).reshape([2, 1])
             increment = ustar + fn * np.dot(self.b(ustar), self.w_inc)
             self.u_ssls[j + 1, :] = increment[:, 0]
-            '''
             uj = increment[:, 0]
             k1 = self.f_sto(uj)
             k2 = self.f_sto(uj + 0.5 * h * k1)
@@ -293,7 +292,6 @@ class StoPLBRM(PLBRMJerezChen):
                 print '\n\n\t\t bone mass outside of bounds'
                 bone_flag = False
                 break
-            '''
             self.print_progress(j + 1, l, 'Progress:', 'Complete',
                                 bar_length=50, ratio=True)
         print'\n'
