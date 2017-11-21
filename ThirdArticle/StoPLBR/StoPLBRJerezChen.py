@@ -247,9 +247,8 @@ class StoPLBRM(PLBRMJerezChen):
                                 bar_length=50, ratio=True)
         urk, z = self.u_rk, self.z
         return urk, z
-
-
-    #
+#
+#
     def ssls(self, seed=123456789, uzero=np.array([1, 1]), fn=1.0):
         h = self.Dt
         l = self.L
@@ -288,10 +287,10 @@ class StoPLBRM(PLBRMJerezChen):
             k4 = self.f_sto(uj + h * k3)
             increment = h / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4)
             self.z_sto[j + 1] = self.z_sto[j] + increment
-            if (self.z_sto[j+1] > 135.0) or (self.z_sto[j+1] < 75):
-                print '\n\n\t\t bone mass outside of bounds'
-                bone_flag = False
-                break
+            # if (self.z_sto[j+1] > 135.0) or (self.z_sto[j+1] < 75):
+               # print '\n\n\t\t bone mass outside of bounds'
+               # bone_flag = False
+               # break
             self.print_progress(j + 1, l, 'Progress:', 'Complete',
                                 bar_length=50, ratio=True)
         print'\n'
