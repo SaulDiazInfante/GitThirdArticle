@@ -18,8 +18,6 @@ T =650 * offset  # almost 48 periods
 """
 with open('state.obj', 'wb') as f:
     dump(np.random.get_state(), f)
-
-
 """
 with open('state.obj', 'rb') as f:
     np.random.set_state(load(f))
@@ -72,7 +70,6 @@ while bone_condition and j < iter_max:
     plt.plot(t, z)
     plt.plot(bm.t_k, z_sto)
     plt.savefig("sto_bonemass.png")
-
     plt.close()
     plt.plot(bm.t_k, ussls[:, 1])
     plt.savefig("ob_path_guide.png")
