@@ -1,0 +1,173 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import rcParams
+from matplotlib.ticker import MaxNLocator
+from mpl_toolkits.axes_grid1.inset_locator import mark_inset
+from mpl_toolkits.axes_grid1.inset_locator import zoomed_inset_axes
+#
+#
+#
+plt.close()
+w = 1.0
+fig_width_pt = 140 * w  # 120 mm
+inches_per_pt = 1.0 / 25.4  # Convert pt to inch
+golden_mean = (np.sqrt(5) - 1.0) / 2.0  # Aesthetic ratio
+fig_width = fig_width_pt * inches_per_pt  # width in inches
+fig_height = fig_width * golden_mean  # eight in inches
+fig_size = [fig_width, fig_height]
+params = {'backend': 'ps',
+          'axes.labelsize': 10,
+          'text.fontsize': 10,
+          'legend.fontsize': 8,
+          'xtick.labelsize': 8,
+          'ytick.labelsize': 8,
+          'text.usetex': True,
+          'figure.figsize': fig_size}
+rcParams.update(params)
+
+
+u_det = np.load("./LocalData/bone_mass_xppaut_graph.npy")
+u_sto_s0 = np.load("./noise_intensity1.0.npy")
+u_sto_s1 = np.load("./noise_intensity0.1.npy")
+u_sto_s2 = np.load("./noise_intensity0.01.npy")
+u_sto_s3 = np.load("./noise_intensity0.001.npy")
+t = u_det[:, 0]
+#
+#
+#
+color_pallet = ['#E37222', '#07889B', '#66B9BF', '#76323F']
+det_color = color_pallet[0]
+sto_color = color_pallet[3]
+alpha_factor = .05
+marker_size = 0.3
+#
+#
+# 1 sigma
+f, axarr = plt.subplots(2, 2)
+f.set_rasterized(True)
+axarr[0, 0].set_title(r'$\sigma$')
+axarr[0, 0].set_ylabel(r'Number of OB')
+axarr[0, 0].axis([-0.5, 10.5, -100, 1600])
+axarr[0, 0].plot(u_det[0:1000, 1],
+                 u_det[0:1000, 2],
+                 '-',
+                 mfc=det_color,
+                 ms=marker_size
+                 )
+axarr[0, 0].plot(u_sto_s0[:, 1],
+                 u_sto_s0[:, 2],
+                 '.',
+                 mfc=sto_color,
+                 ms=marker_size,
+                 alpha=.5*alpha_factor
+                 )
+#
+#
+# 0.1 sigma
+axarr[0, 1].set_title(r'0.1 $\sigma$')
+axarr[0, 1].set_xlabel(r'Number of OC')
+axarr[0, 1].axis([-0.5, 10.5, -100, 1600])
+axarr[0, 1].plot(u_det[0:1000, 1],
+                 u_det[0:1000, 2],
+                 '-',
+                 mfc=det_color,
+                 ms=marker_size
+                 )
+axarr[0, 1].plot(u_sto_s1[:, 1],
+                 u_sto_s1[:, 2],
+                 '.',
+                 mfc=sto_color,
+                 ms=marker_size,
+                 alpha=.5*alpha_factor
+                 )
+#
+#
+# 0.01 sigma
+# axarr[1, 0] = plt.subplot2grid((2, 2), (1, 0), colspan=2)
+axarr[1, 0].set_title(r'0.01 $\sigma$')
+axarr[1, 0].set_ylabel(r'Number of OB')
+axarr[1, 0].set_title(r'0.01 $\sigma$')
+axarr[1, 0].axis([-0.5, 10.5, -100, 1600])
+axarr[1, 0].plot(u_det[0:1000, 1],
+                 u_det[0:1000, 2],
+                 '-',
+                 mfc=det_color,
+                 ms=marker_size
+                 )
+axarr[1, 0].plot(u_sto_s2[:, 1],
+                 u_sto_s2[:, 2],
+                 '.',
+                 mfc=sto_color,
+                 ms=marker_size,
+                 alpha=2*alpha_factor
+                 )
+#
+# 0.01 sigma
+#
+#
+axarr[1, 1].set_title(r'0.001 $\sigma$')
+axarr[1, 1].set_xlabel(r'Number of OC')
+axarr[1, 1].axis([-0.5, 10.5, -100, 1600])
+axarr[1, 1].plot(u_det[0:1000, 1],
+                 u_det[0:1000, 2],
+                 '-',
+                 mfc=det_color,
+                 ms=marker_size
+                 )
+axarr[1, 1].plot(u_sto_s3[:, 1],
+                 u_sto_s3[:, 2],
+                 '.',
+                 mfc=sto_color,
+                 ms=marker_size,
+                 alpha=2*alpha_factor
+                 )
+
+axins_1 = zoomed_inset_axes(axarr[1, 0], 40, loc=5)
+axins_1.plot(u_det[0:1000, 1],
+             u_det[0:1000, 2],
+             '-',
+             mfc=det_color,
+             ms=marker_size
+             )
+axins_1.plot(u_sto_s2[:, 1],
+             u_sto_s2[:, 2],
+             '.',
+             mfc=sto_color,
+             ms=marker_size,
+             alpha=alpha_factor
+             )
+axins_1.axis([0.05, .15, 1280, 1300])
+axins_1.xaxis.tick_top()
+mark_inset(axarr[1, 0], axins_1, loc1=3, loc2=2, fc="none", ec="0.5")
+axins_1.xaxis.set_major_locator(MaxNLocator(nbins=3, prune='lower'))
+#
+#
+#
+axins_2 = zoomed_inset_axes(axarr[1, 1], 40, loc=5)
+axins_2.plot(u_det[0:1000, 1],
+             u_det[0:1000, 2],
+             '-',
+             mfc=det_color,
+             ms=marker_size
+             )
+axins_2.plot(u_sto_s3[:, 1],
+             u_sto_s3[:, 2],
+             '.',
+             mfc=sto_color,
+             ms=marker_size,
+             alpha=alpha_factor
+             )
+axins_2.axis([0.05, .15, 1280, 1300])
+axins_2.xaxis.tick_top()
+mark_inset(axarr[1, 1], axins_2, loc1=3, loc2=2, fc="none", ec="0.5")
+axins_2.xaxis.set_major_locator(MaxNLocator(nbins=3, prune='lower'))
+#
+#
+# Fine-tune figure; hide x ticks for top plots and y ticks for right plots
+#
+#
+#
+plt.setp([a.get_xticklabels() for a in axarr[0, :]], visible=False)
+plt.setp([a.get_yticklabels() for a in axarr[:, 1]], visible=False)
+plt.tight_layout()
+plt.savefig('NoiseFigure.eps', format='eps', dpi=1000)
